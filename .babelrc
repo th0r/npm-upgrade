@@ -1,0 +1,4 @@
+{
+    "loose": "all",
+    "optional": ["runtime"]
+}
