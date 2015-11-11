@@ -1,69 +1,51 @@
 #! /usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs'
+import path from 'path'
 
-const _ = require('lodash');
-const ncu = require('npm-check-updates');
-const inquirer = require('inquirer');
+import _ from 'lodash'
+import ncu from 'npm-check-updates'
+import { white } from 'chalk'
+import { colorizeDiff } from 'npm-check-updates/lib/version-util';
 
-const DEPS_GROUPS = ['dependencies', 'devDependencies', 'optionalDependencies'];
-
-function findModuleDepsGroup(moduleName, packageJson) {
-    for (let group of DEPS_GROUPS) {
-        const modules = packageJson[group];
-
-        if (modules && modules[moduleName]) {
-            return modules;
-        }
-    }
-
-    return null;
-}
-
-function getModuleVersion(moduleName, packageJson) {
-    const depsGroup = findModuleDepsGroup(moduleName, packageJson);
-
-    return depsGroup ? depsGroup[moduleName] : null;
-}
-
-function setModuleVersion(moduleName, newVersion, packageJson) {
-    const depsGroup = findModuleDepsGroup(moduleName, packageJson);
-
-    if (depsGroup) {
-        depsGroup[moduleName] = newVersion;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-async function askUser(questions) {
-    return new Promise(resolve => inquirer.prompt(questions, resolve));
-}
+import { getModuleVersion, setModuleVersion } from '../packageUtils'
+import { createSimpleTable } from '../cliTable'
+import askUser from '../askUser'
 
 (async function main() {
     const packageFile = path.resolve(process.argv[2] || './package.json');
     let packageJson = require(packageFile);
     console.log(`Checking for outdated modules for "${packageFile}"...`);
-    const updated = await ncu.run({ packageFile });
+    let updated = await ncu.run({ packageFile });
 
     if (_.isEmpty(updated)) {
         return console.log(`All modules are up-to-date!`);
     }
 
-    const updatedList = _(updated)
-        .map((newVersion, moduleName) => `${moduleName}: ${newVersion}`)
-        .join('\n')
-        .valueOf();
+    // Replacing new versions to `{ from: ..., to: ... }` object
+    updated = _.mapValues(updated, (newVersion, moduleName) => ({
+        from: getModuleVersion(moduleName, packageJson),
+        to: newVersion
+    }));
 
-    console.log(`New versions of modules available:\n\n${updatedList}\n`);
+    // Creating pretty-printed CLI table with update info
+    const updatedTable = createSimpleTable(
+        _.map(updated, ({ from, to }, moduleName) =>
+            [white.bold(moduleName), from, '→', colorizeDiff(to, from)]
+        ),
+        {
+            style: { 'padding-left': 2 },
+            colAligns: ['left', 'right', 'right', 'right']
+        }
+    );
 
-    const questions = _.map(updated, (newVersion, moduleName) => {
+    console.log(`\nNew versions of modules available:\n\n${updatedTable}\n`);
+
+    const questions = _.map(updated, ({ from, to }, moduleName) => {
         return {
             type: 'list',
             name: moduleName,
-            message: `Update "${moduleName}" from ${getModuleVersion(moduleName, packageJson)} to ${updated[moduleName]}?`,
+            message: `Update "${moduleName}" in package.json from ${from} to ${colorizeDiff(to, from)}?`,
             choices: [
                 { name: 'Yes', value: true },
                 { name: 'No', value: false }
@@ -78,7 +60,7 @@ async function askUser(questions) {
     _.each(answers, (shouldUpdate, moduleName) => {
         if (shouldUpdate) {
             packageUpdated = true;
-            setModuleVersion(moduleName, updated[moduleName], packageJson);
+            setModuleVersion(moduleName, updated[moduleName].to, packageJson);
         }
     });
 
@@ -97,7 +79,7 @@ async function askUser(questions) {
             fs.writeFileSync(packageFile, `${packageJson}\n`);
         }
     } else {
-        console.log('Nothing to update');
+        console.log('All dependencies are up-to-date');
     }
 })().catch(err => {
     console.error(err.message);
