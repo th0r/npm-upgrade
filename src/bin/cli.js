@@ -4,34 +4,38 @@ import fs from 'fs'
 import path from 'path'
 
 import _ from 'lodash'
-import ncu from 'npm-check-updates'
 import { white } from 'chalk'
+import opener from 'opener'
+import ncu from 'npm-check-updates'
 import { colorizeDiff } from 'npm-check-updates/lib/version-util';
 
-import { getModuleVersion, setModuleVersion } from '../packageUtils'
+import { getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils'
 import { createSimpleTable } from '../cliTable'
 import askUser from '../askUser'
+
+const strong = white.bold;
 
 (async function main() {
     const packageFile = path.resolve(process.argv[2] || './package.json');
     let packageJson = require(packageFile);
-    console.log(`Checking for outdated modules for "${packageFile}"...`);
-    let updated = await ncu.run({ packageFile });
+    console.log(`Checking for outdated modules for "${strong(packageFile)}"...`);
+    let updatedModules = await ncu.run({ packageFile });
 
-    if (_.isEmpty(updated)) {
-        return console.log(`All modules are up-to-date!`);
+    if (_.isEmpty(updatedModules)) {
+        return console.log(`All dependencies are up-to-date!`);
     }
 
-    // Replacing new versions to `{ from: ..., to: ... }` object
-    updated = _.mapValues(updated, (newVersion, moduleName) => ({
+    // Making array of outdated modules
+    updatedModules = _.map(updatedModules, (newVersion, moduleName) => ({
+        name: moduleName,
         from: getModuleVersion(moduleName, packageJson),
         to: newVersion
     }));
 
     // Creating pretty-printed CLI table with update info
     const updatedTable = createSimpleTable(
-        _.map(updated, ({ from, to }, moduleName) =>
-            [white.bold(moduleName), from, '→', colorizeDiff(to, from)]
+        _.map(updatedModules, ({ name, from, to }) =>
+            [strong(name), from, '→', colorizeDiff(to, from)]
         ),
         {
             style: { 'padding-left': 2 },
@@ -39,30 +43,49 @@ import askUser from '../askUser'
         }
     );
 
-    console.log(`\nNew versions of modules available:\n\n${updatedTable}\n`);
-
-    const questions = _.map(updated, ({ from, to }, moduleName) => {
-        return {
-            type: 'list',
-            name: moduleName,
-            message: `Update "${moduleName}" in package.json from ${from} to ${colorizeDiff(to, from)}?`,
-            choices: [
-                { name: 'Yes', value: true },
-                { name: 'No', value: false }
-            ],
-            default: 0
-        }
-    });
-
-    const answers = await askUser(questions);
+    console.log(`\nNew versions of modules available:\n\n${updatedTable}`);
 
     let packageUpdated = false;
-    _.each(answers, (shouldUpdate, moduleName) => {
-        if (shouldUpdate) {
+    do {
+        const outdatedModule = updatedModules.shift();
+        const { name, from, to } = outdatedModule;
+        let { homepage } = outdatedModule;
+        const isHomepageChecked = (homepage !== undefined);
+        console.log('');
+        const { [name]: answer } = await askUser([{
+            type: 'list',
+            name: name,
+            message: `${isHomepageChecked ? 'So, u' : 'U'}pdate "${name}" in package.json from ${from} to ${colorizeDiff(to, from)}?`,
+            choices: _.compact([
+                { name: 'Yes', value: true },
+                { name: 'No', value: false },
+                // Don't show this option if we haven't found info about homepage in module's package.json
+                (homepage !== null) &&
+                    { name: 'Open homepage or changelog', value: 'homepage' }
+            ]),
+            default: 0
+        }]);
+
+        if (answer === 'homepage') {
+            // Ask user about this module again
+            updatedModules.unshift(outdatedModule);
+
+            if (!isHomepageChecked) {
+                console.log('Trying to find homepage or changelog URL...');
+                homepage = outdatedModule.homepage = getModuleHomepage(await getModuleInfo(name));
+            }
+
+            if (homepage) {
+                console.log(`Opening ${strong(homepage)}...`);
+                opener(homepage);
+            } else {
+                console.log(`Sorry, there is no info about homepage or changelog URL in the ${strong(name)}'s package.json`);
+            }
+        } else if (answer === true) {
             packageUpdated = true;
-            setModuleVersion(moduleName, updated[moduleName].to, packageJson);
+            setModuleVersion(name, to, packageJson);
         }
-    });
+    } while (updatedModules.length);
 
     // Adds new line
     console.log('');
@@ -79,7 +102,7 @@ import askUser from '../askUser'
             fs.writeFileSync(packageFile, `${packageJson}\n`);
         }
     } else {
-        console.log('All dependencies are up-to-date');
+        console.log('Nothing to update');
     }
 })().catch(err => {
     console.error(err.message);

@@ -1,3 +1,6 @@
+import _ from 'lodash'
+import npm from 'npm'
+
 const DEPS_GROUPS = ['dependencies', 'devDependencies', 'optionalDependencies'];
 
 export function findModuleDepsGroup(moduleName, packageJson) {
@@ -27,4 +30,26 @@ export function setModuleVersion(moduleName, newVersion, packageJson) {
     } else {
         return false;
     }
+}
+
+export function getModuleHomepage(packageJson) {
+    return packageJson.changelog || packageJson.homepage || packageJson.url || null;
+}
+
+export async function getModuleInfo(moduleName) {
+    // This function is only supposed to run after `npm-check-updates`, so we don't need to call `npm.load()` here
+    return new Promise((resolve, reject) => {
+        try {
+            npm.commands.view([moduleName], true, (err, moduleInfo) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    // `moduleInfo` contains object `{ <version>: <info> }`, so we should extract info from there
+                    resolve(_.values(moduleInfo)[0]);
+                }
+            });
+        } catch (err) {
+            reject(err);
+        }
+    });
 }
