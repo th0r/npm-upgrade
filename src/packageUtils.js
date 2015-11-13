@@ -1,10 +1,10 @@
-import _ from 'lodash'
-import npm from 'npm'
+import _ from 'lodash';
+import npm from 'npm';
 
 const DEPS_GROUPS = ['dependencies', 'devDependencies', 'optionalDependencies'];
 
 export function findModuleDepsGroup(moduleName, packageJson) {
-    for (let group of DEPS_GROUPS) {
+    for (const group of DEPS_GROUPS) {
         const modules = packageJson[group];
 
         if (modules && modules[moduleName]) {
@@ -38,7 +38,7 @@ export function getModuleHomepage(packageJson) {
 
 export async function getModuleInfo(moduleName) {
     // This function is only supposed to run after `npm-check-updates`, so we don't need to call `npm.load()` here
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
         try {
             npm.commands.view([moduleName], true, (err, moduleInfo) => {
                 if (err) {

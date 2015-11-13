@@ -1,6 +1,6 @@
-const gulp = require('gulp');
-const babel = require('gulp-babel');
-const del = require('del');
+import gulp from 'gulp';
+import babel from 'gulp-babel';
+import del from 'del';
 
 gulp.task('default', ['build']);
 

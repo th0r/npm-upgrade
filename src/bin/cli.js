@@ -1,17 +1,17 @@
 #! /usr/bin/env node
 
-import fs from 'fs'
-import path from 'path'
+import fs from 'fs';
+import path from 'path';
 
-import _ from 'lodash'
-import { white } from 'chalk'
-import opener from 'opener'
-import ncu from 'npm-check-updates'
+import _ from 'lodash';
+import { white } from 'chalk';
+import opener from 'opener';
+import ncu from 'npm-check-updates';
 import { colorizeDiff } from 'npm-check-updates/lib/version-util';
 
-import { getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils'
-import { createSimpleTable } from '../cliTable'
-import askUser from '../askUser'
+import { getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
+import { createSimpleTable } from '../cliTable';
+import askUser from '../askUser';
 
 const strong = white.bold;
 
@@ -54,7 +54,7 @@ const strong = white.bold;
         console.log('');
         const { [name]: answer } = await askUser([{
             type: 'list',
-            name: name,
+            name,
             message: `${isHomepageChecked ? 'So, u' : 'U'}pdate "${name}" in package.json from ${from} to ${colorizeDiff(to, from)}?`,
             choices: _.compact([
                 { name: 'Yes', value: true },
