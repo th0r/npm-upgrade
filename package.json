@@ -5,6 +5,7 @@
   "author": "Yuriy Grunin <grunin.ya@ya.ru>",
   "license": "MIT",
   "homepage": "https://github.com/th0r/npm-upgrade",
+  "changelog": "https://github.com/th0r/npm-upgrade/blob/master/CHANGELOG.md",
   "bugs": "https://github.com/th0r/npm-upgrade/issues",
   "repository": "th0r/npm-upgrade",
   "main": "./lib/bin/cli.js",
@@ -23,7 +24,7 @@
     "inquirer": "^0.11.0",
     "lodash": "^3.10.1",
     "npm": "^3.3.12",
-    "npm-check-updates": "^2.4.1",
+    "npm-check-updates": "^2.4.2",
     "opener": "^1.4.1"
   },
   "devDependencies": {
