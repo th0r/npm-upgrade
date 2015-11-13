@@ -1,3 +1,5 @@
 {
-    "babel": "https://github.com/babel/babel/blob/master/CHANGELOG.md"
+    "babel": "https://github.com/babel/babel/blob/master/CHANGELOG.md",
+    "babel-core": "https://github.com/babel/babel/blob/master/CHANGELOG.md",
+    "babel-runtime": "https://github.com/babel/babel/blob/master/CHANGELOG.md"
 }
