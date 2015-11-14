@@ -1,4 +1,4 @@
-const Table = require('cli-table');
+import Table from 'cli-table';
 
 export function createSimpleTable(rows, opts) {
     const table = new Table({
