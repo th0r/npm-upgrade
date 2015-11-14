@@ -1,18 +1,9 @@
 const Table = require('cli-table');
 
-export function createTable(rows, opts) {
-    const table = new Table(opts);
-
-    if (rows) {
-        table.push(...rows);
-    }
-
-    return table;
-}
-
 export function createSimpleTable(rows, opts) {
-    return createTable(rows, {
-        ...opts,
+    const table = new Table({
+        style: { 'padding-left': 2 },
+        colAligns: ['left', 'right', 'right', 'right'],
         chars: {
             'top': '',
             'top-mid': '',
@@ -29,6 +20,13 @@ export function createSimpleTable(rows, opts) {
             'right': '',
             'right-mid': '',
             'middle': ''
-        }
+        },
+        ...opts
     });
+
+    if (rows) {
+        table.push(...rows);
+    }
+
+    return table;
 }

@@ -33,13 +33,13 @@ export function setModuleVersion(moduleName, newVersion, packageJson) {
 }
 
 export function getModuleHomepage(packageJson) {
-    return packageJson.changelog || packageJson.homepage || packageJson.url || null;
+    return packageJson.homepage || packageJson.url || null;
 }
 
-export async function getModuleInfo(moduleName) {
-    // This function is only supposed to run after `npm-check-updates`, so we don't need to call `npm.load()` here
-    return await new Promise((resolve, reject) => {
+export const getModuleInfo = _.memoize(async moduleName =>
+    await new Promise((resolve, reject) => {
         try {
+            // This function is only supposed to run after `npm-check-updates`, so we don't need to call `npm.load()` here
             npm.commands.view([moduleName], true, (err, moduleInfo) => {
                 if (err) {
                     reject(err);
@@ -51,5 +51,5 @@ export async function getModuleInfo(moduleName) {
         } catch (err) {
             reject(err);
         }
-    });
-}
+    })
+);

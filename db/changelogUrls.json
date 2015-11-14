@@ -1,0 +1,6 @@
+{
+    "bluebird": "http://bluebirdjs.com/docs/changelog.html",
+    "fluxible": "https://github.com/yahoo/fluxible/blob/master/packages/fluxible/CHANGELOG.md",
+    "lodash": "https://github.com/lodash/lodash/wiki/Changelog",
+    "webpack": "http://webpack.github.io/docs/changelog.html"
+}
