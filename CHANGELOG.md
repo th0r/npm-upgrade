@@ -3,9 +3,23 @@
 > **Tags:**
 > - [Breaking Change]
 > - [New Feature]
+> - [Improvement]
 > - [Bug Fix]
 > - [Internal]
 > - [Documentation]
+
+## 0.4.0
+
+ * **Breaking Change**
+  * Changelog URLs database have been moved from `data/homepages.json` to `db/changelogUrls.json`
+ * **Improvement**
+  * Utility now tries to find changelog URL for modules hosted on GitHub.
+    It will check for some common changelog filenames like `CHANGELOG.md`, `History.md` etc. and
+    open them in browser if they are present in the repository.
+    If not, it will open project's `releases` page.
+ * **New Feature**
+  * Added dev CLI utility to easily add module's changelog URL to the database (`tools/addModuleChangelogUrlToDb.js`).
+    Run it without arguments for more info.
 
 ## 0.3.0
 
