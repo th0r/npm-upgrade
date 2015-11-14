@@ -8,7 +8,7 @@
 > - [Internal]
 > - [Documentation]
 
-## 0.4.0
+## 0.4.1
 
  * **Breaking Change**
   * Changelog URLs database have been moved from `data/homepages.json` to `db/changelogUrls.json`
