@@ -86,7 +86,7 @@ const strong = white.bold;
                     changelogUrl = outdatedModule.changelogUrl = await findModuleChangelogUrl(name, DEFAULT_REMOTE_CHANGELOGS_DB_URL);
                 }
 
-                if (false && changelogUrl) {
+                if (changelogUrl) {
                     console.log(`Opening ${strong(changelogUrl)}...`);
                     opener(changelogUrl);
                 } else {
