@@ -39,7 +39,8 @@
   },
   "files": [
     "lib",
-    "src"
+    "src",
+    "db"
   ],
   "directories": {
     "lib": "./lib"
