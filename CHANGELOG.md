@@ -10,7 +10,7 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
-## 0.4.2
+## 0.4.3
 
  * **Breaking Change**
   * Changelog URLs database have been moved from `data/homepages.json` to `db/changelogUrls.json`
