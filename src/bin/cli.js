@@ -11,12 +11,14 @@ import { colorizeDiff } from 'npm-check-updates/lib/version-util';
 
 import { getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
 import { fetchRemoteDb, findModuleChangelogUrl } from '../changelogUtils';
+import { getRepositoryInfo } from '../repositoryUtils';
 import { createSimpleTable } from '../cliTable';
 import askUser from '../askUser';
 
-const { repository, bugs } = require('../../package.json');
+const pkg = require('../../package.json');
 
-const DEFAULT_REMOTE_CHANGELOGS_DB_URL = `https://raw.githubusercontent.com/${repository}/master/db/changelogUrls.json`;
+const CURRENT_REPOSITORY_ID = getRepositoryInfo(pkg.repository.url).repositoryId;
+const DEFAULT_REMOTE_CHANGELOGS_DB_URL = `https://raw.githubusercontent.com/${CURRENT_REPOSITORY_ID}/master/db/changelogUrls.json`;
 
 const strong = white.bold;
 
@@ -92,7 +94,7 @@ const strong = white.bold;
                 } else {
                     console.log(
                         `Sorry, we haven't found changelog URL for ${strong(name)} module.\n` +
-                        `It would be great if you could fill an issue about this here: ${strong(bugs)}\n` +
+                        `It would be great if you could fill an issue about this here: ${strong(pkg.bugs)}\n` +
                         'Thanks a lot!'
                     );
                 }

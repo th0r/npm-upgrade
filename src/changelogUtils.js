@@ -1,39 +1,11 @@
-import { parse as parseUrl } from 'url';
-
 import Bluebird from 'bluebird';
 import _ from 'lodash';
 import got from 'got';
 
 import { getModuleInfo } from './packageUtils';
-
-const CHANGELOG_URL_BUILDERS = {
-    'github.com': repositoryUrl => {
-        const moduleId = /^(.+?\/.+?)(?:\/|\.|$)/.exec(repositoryUrl.pathname.slice(1))[1];
-        const rootUrl = `https://github.com/${moduleId}/blob/master`;
-
-        return {
-            builder: changelogFileName => `${rootUrl}/${changelogFileName}`,
-            releasesUrl: `https://github.com/${moduleId}/releases`
-        };
-    }
-};
+import { getRepositoryInfo } from './repositoryUtils';
 
 const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'CHANGES.md'];
-
-function getChangelogUrlsForRepository(repositoryUrl) {
-    const parsedUrl = parseUrl(repositoryUrl);
-
-    if (_.has(CHANGELOG_URL_BUILDERS, parsedUrl.hostname)) {
-        const { builder, releasesUrl } = CHANGELOG_URL_BUILDERS[parsedUrl.hostname](parsedUrl);
-
-        return {
-            possibleUrls: _.map(COMMON_CHANGELOG_FILES, builder),
-            releasesUrl
-        };
-    } else {
-        return null;
-    }
-}
 
 export const fetchRemoteDb = _.memoize(async url => {
     try {
@@ -66,13 +38,15 @@ export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUr
 
     if (repository && repository.url) {
         // If repository is located on one of known hostings, then we will try to request
-        // some common changelog files from there or return URL or "Releases" page
-        const changelogUrls = getChangelogUrlsForRepository(repository.url);
+        // some common changelog files from there or return URL for "Releases" page
+        const { fileUrlBuilder, releasesPageUrl } = getRepositoryInfo(repository.url) || {};
 
-        if (changelogUrls) {
+        if (fileUrlBuilder) {
+            const possibleChangelogUrls = _.map(COMMON_CHANGELOG_FILES, fileUrlBuilder);
+
             try {
                 return await Bluebird.any(
-                    _.map(changelogUrls.possibleUrls, url =>
+                    _.map(possibleChangelogUrls, url =>
                         Bluebird
                             .try(() => got(url))
                             .return(url)
@@ -81,18 +55,16 @@ export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUr
             } catch (err) {
                 if (!(err instanceof Bluebird.AggregateError)) throw err;
             }
+        }
 
-            const { releasesUrl } = changelogUrls;
-
-            if (releasesUrl) {
-                try {
-                    // Checking `releasesUrl`...
-                    await got(releasesUrl);
-                    // `releasesUrl` is fine
-                    return releasesUrl;
-                } catch (err) {
-                    // `releasesUrl` is broken
-                }
+        if (releasesPageUrl) {
+            try {
+                // Checking `releasesUrl`...
+                await got(releasesPageUrl);
+                // `releasesUrl` is fine
+                return releasesPageUrl;
+            } catch (err) {
+                // `releasesPageUrl` is broken
             }
         }
     }

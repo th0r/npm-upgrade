@@ -7,7 +7,10 @@
   "homepage": "https://github.com/th0r/npm-upgrade",
   "changelog": "https://github.com/th0r/npm-upgrade/blob/master/CHANGELOG.md",
   "bugs": "https://github.com/th0r/npm-upgrade/issues",
-  "repository": "th0r/npm-upgrade",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/th0r/npm-upgrade.git"
+  },
   "main": "./lib/bin/cli.js",
   "bin": "./lib/bin/cli.js",
   "scripts": {
