@@ -26,6 +26,6 @@ changelogUrls = Object.keys(changelogUrls)
         return newChangelogUrls;
     }, {});
 
-fs.writeFileSync(CHANGELOG_URLS_DB_FILE, JSON.stringify(changelogUrls, null, 4));
+fs.writeFileSync(CHANGELOG_URLS_DB_FILE, JSON.stringify(changelogUrls, null, 4) + '\n');
 
 console.log('Changelog URL for "%s" module set to "%s"', moduleName, changelogUrl);
