@@ -27,6 +27,20 @@ npm-upgrade
 Utility will find all of your outdated deps and ask to update them in `package.json`. Just answer the questions and you are done.
 Use `Ctrl-C` to exit if you changed your mind.
 
+## Troubleshooting
+**Wrong changelog shown for _\<moduleName\>_ or not shown at all!**
+
+Yes, It can happen sometimes. This is because there is no standardized way to specify changelog location for the module, so it tries to guess it, using these rules one by one:
+
+1. Check `db/changelogUrls.json` from `master` branch on GitHub or the local copy if it's unreachable.
+2. Check `changelog` field from module's `package.json`.
+3. Parse module's `repository.url` field and if it's on GitHub, try to request some common changelog files (`CHANGELOG.md`, `History.md` etc.) from `master` branch and if it fails, open `Releases` page.
+
+So, if it guessed wrong it would be great if you could either [fill an issue](issues/new) about this or submit a PR which adds proper changelog URL to `db/changelogUrls.json`. There is a tool in the repository for you to make it as easy as possible:
+```sh
+./tools/addModuleChangelogUrlToDb.js <moduleName> <changelogUrl>
+```
+
 ## License
 
 [MIT](LICENSE)
