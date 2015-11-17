@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.4.4
+ * **Bug Fix**
+  * Fixed bug with requesting remote changelog URLs database
+
 ## 0.4.3
 
  * **Breaking Change**
