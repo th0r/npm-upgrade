@@ -1,10 +1,14 @@
 import _ from 'lodash';
 import npm from 'npm';
 
-const DEPS_GROUPS = ['dependencies', 'devDependencies', 'optionalDependencies'];
+export const DEPS_GROUPS = [
+    { name: 'production', field: 'dependencies' },
+    { name: 'development', field: 'devDependencies' },
+    { name: 'optional', field: 'optionalDependencies' }
+];
 
 export function findModuleDepsGroup(moduleName, packageJson) {
-    for (const group of DEPS_GROUPS) {
+    for (const group of _.pluck(DEPS_GROUPS, 'field')) {
         const modules = packageJson[group];
 
         if (modules && modules[moduleName]) {

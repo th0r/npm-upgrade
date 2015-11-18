@@ -25,6 +25,7 @@
     "bluebird": "^3.0.5",
     "chalk": "^1.1.1",
     "cli-table": "^0.3.1",
+    "commander": "^2.9.0",
     "got": "^4.2.0",
     "inquirer": "^0.11.0",
     "lodash": "^3.10.1",

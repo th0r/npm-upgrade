@@ -1,15 +1,16 @@
 #! /usr/bin/env node
 
 import fs from 'fs';
-import path from 'path';
+import { resolve } from 'path';
 
 import _ from 'lodash';
 import { white } from 'chalk';
 import opener from 'opener';
+import { Command } from 'commander';
 import ncu from 'npm-check-updates';
 import { colorizeDiff } from 'npm-check-updates/lib/version-util';
 
-import { getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
+import { DEPS_GROUPS, getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
 import { fetchRemoteDb, findModuleChangelogUrl } from '../changelogUtils';
 import { getRepositoryInfo } from '../repositoryUtils';
 import { createSimpleTable } from '../cliTable';
@@ -22,16 +23,49 @@ const DEFAULT_REMOTE_CHANGELOGS_DB_URL = `https://raw.githubusercontent.com/${CU
 
 const strong = white.bold;
 
+// Creating CLI utility
+const utility = new Command()
+    .version(pkg.version)
+    .allowUnknownOption(false);
+
+// Adding options to check only specified groups of dependencies
+_.each(DEPS_GROUPS, ({ name, field }) =>
+    utility.option(`-${name[0]}, --${name}`, `Check only "${field}"`)
+);
+
+const args = utility.parse(process.argv);
+
+// Checking all the deps if all of them are omitted
+if (_.every(DEPS_GROUPS, ({ name }) => args[name] === undefined)) {
+    _.each(DEPS_GROUPS, ({ name }) => args[name] = true);
+}
+
 (async function main() {
-    const packageFile = path.resolve(process.argv[2] || './package.json');
-    let packageJson = require(packageFile);
+    // Loading `package.json` from the current directory
+    const packageFile = resolve('./package.json');
+    let packageJson;
+    try {
+        packageJson = require(packageFile);
+    } catch (err) {
+        console.error(`Error loading package.json: ${err.message}`);
+        process.exit(1);
+    }
 
     // Fetching remote changelogs db in background
     // TODO: allow to specify database url as command line argument
     fetchRemoteDb(DEFAULT_REMOTE_CHANGELOGS_DB_URL);
 
-    console.log(`Checking for outdated modules for "${strong(packageFile)}"...`);
-    let updatedModules = await ncu.run({ packageFile });
+    const depsGroupsToCheck = _.filter(DEPS_GROUPS, ({ name }) => !!args[name]);
+    const depsGroupsToCheckStr = (depsGroupsToCheck.length === DEPS_GROUPS.length) ?
+        '' : `${_.pluck(depsGroupsToCheck, 'name').join(' and ')} `;
+
+    console.log(`Checking for outdated ${depsGroupsToCheckStr}dependencies for "${strong(packageFile)}"...`);
+    let updatedModules = await ncu.run({
+        packageFile,
+        prod: args.production,
+        dev: args.development,
+        optional: args.optional
+    });
 
     if (_.isEmpty(updatedModules)) {
         return console.log(`All dependencies are up-to-date!`);
