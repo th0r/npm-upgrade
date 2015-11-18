@@ -127,8 +127,8 @@ if (_.every(DEPS_GROUPS, ({ name }) => args[name] === undefined)) {
                     opener(changelogUrl);
                 } else {
                     console.log(
-                        `Sorry, we haven't found changelog URL for ${strong(name)} module.\n` +
-                        `It would be great if you could fill an issue about this here: ${strong(pkg.bugs)}\n` +
+                        `Sorry, we haven't found any changelog URL for ${strong(name)} module.\n` +
+                        `It would be great if you could fill an issue about this here: ${strong(pkg.bugs.url)}\n` +
                         'Thanks a lot!'
                     );
                 }

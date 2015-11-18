@@ -6,7 +6,9 @@
   "license": "MIT",
   "homepage": "https://github.com/th0r/npm-upgrade",
   "changelog": "https://github.com/th0r/npm-upgrade/blob/master/CHANGELOG.md",
-  "bugs": "https://github.com/th0r/npm-upgrade/issues",
+  "bugs": {
+    "url": "https://github.com/th0r/npm-upgrade/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/th0r/npm-upgrade.git"
