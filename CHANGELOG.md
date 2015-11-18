@@ -10,6 +10,12 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.5.1
+
+ * **Bug Fix**
+  * Fixed URL to the issues page for the "couldn't find the changelog" message
+  * Fixed detection of the repository's "Releases" page on GitHub if it contains dot in the name
+
 ## 0.5.0
 
  * **New Feature**

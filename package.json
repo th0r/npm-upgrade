@@ -1,6 +1,6 @@
 {
   "name": "npm-upgrade",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Interactive CLI utility to easily update outdated NPM dependencies",
   "author": "Yuriy Grunin <grunin.ya@ya.ru>",
   "license": "MIT",
