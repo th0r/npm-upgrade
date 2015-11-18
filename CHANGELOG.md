@@ -10,7 +10,13 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.5.0
+
+ * **New Feature**
+  * CLI options added to only check for specified groups of dependencies (see [Options](README.md#options) section in `README.md`)
+
 ## 0.4.4
+
  * **Bug Fix**
   * Fixed bug with requesting remote changelog URLs database
 

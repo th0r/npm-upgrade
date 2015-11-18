@@ -19,13 +19,23 @@ npm i -g npm-upgrade
 ```
 
 ## Usage
-Run `npm-upgrade` in the root directory of your Node.js project (it must contain `package.json` that you want to update):
+Run `npm-upgrade [options]` in the root directory of your Node.js project (it must contain `package.json` that you want to update):
 ```sh
 cd ~/my-projects/my-node-project
 npm-upgrade
 ```
 Utility will find all of your outdated deps and ask to update them in `package.json`. Just answer the questions and you are done.
+
 Use `Ctrl-C` to exit if you changed your mind.
+
+## Options
+```
+-h, --help         output usage information
+-V, --version      output the version number
+-p, --production   Check only "dependencies"
+-d, --development  Check only "devDependencies"
+-o, --optional     Check only "optionalDependencies"
+```
 
 ## Troubleshooting
 **Wrong changelog shown for _\<moduleName\>_ or not shown at all!**
