@@ -1,6 +1,6 @@
 {
     "root": true,
-    "extends": ".eslintrc-es5",
+    "extends": ".eslintrc-es5.json",
     "parser": "babel-eslint",
     "env": {
         "es6": true
@@ -49,4 +49,4 @@
         "prefer-template": 2,
         "require-yield": 2
     }
-}
+};
