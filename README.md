@@ -19,12 +19,30 @@ npm i -g npm-upgrade
 ```
 
 ## Usage
-Run `npm-upgrade [options]` in the root directory of your Node.js project (it must contain `package.json` that you want to update):
+Run `npm-upgrade [options] [filter]` in the root directory of your Node.js project (it must contain `package.json` that you want to update):
 ```sh
 cd ~/my-projects/my-node-project
 npm-upgrade
 ```
 Utility will find all of your outdated deps and ask to update them in `package.json`. Just answer the questions and you are done.
+
+If you want to check only some deps, you can use `filter` argument:
+```sh
+# Will check only `babel-core`:
+npm-upgrade babel-core
+
+# Will check all the deps with `babel` in the name:
+npm-upgrade '*babel*'
+
+# Note quotes around `filter`. They are necessary because without them bash may interpret `*` as wildcard character.
+
+# Will check all the deps, excluding any with `babel` in the name:
+npm-upgrade '!*babel*'
+
+# You can combine including and excluding rules:
+npm-upgrade '*babel* !babel-transform-* !babel-preset-*'
+
+```
 
 Use `Ctrl-C` to exit if you changed your mind.
 

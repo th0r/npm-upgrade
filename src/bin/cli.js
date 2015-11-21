@@ -10,6 +10,7 @@ import { Command } from 'commander';
 import ncu from 'npm-check-updates';
 import { colorizeDiff } from 'npm-check-updates/lib/version-util';
 
+import { makeFilterFunction } from '../filterUtils';
 import { DEPS_GROUPS, getModuleVersion, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
 import { fetchRemoteDb, findModuleChangelogUrl } from '../changelogUtils';
 import { getRepositoryInfo } from '../repositoryUtils';
@@ -26,6 +27,7 @@ const strong = white.bold;
 // Creating CLI utility
 const utility = new Command()
     .version(pkg.version)
+    .arguments('[filter]')
     .allowUnknownOption(false);
 
 // Adding options to check only specified groups of dependencies
@@ -33,11 +35,14 @@ _.each(DEPS_GROUPS, ({ name, field }) =>
     utility.option(`-${name[0]}, --${name}`, `Check only "${field}"`)
 );
 
-const args = utility.parse(process.argv);
+const { args: [filter], ...opts } = utility.parse(process.argv);
+
+// Making function that will filter out deps by module name
+const filterModuleName = makeFilterFunction(filter);
 
 // Checking all the deps if all of them are omitted
-if (_.every(DEPS_GROUPS, ({ name }) => args[name] === undefined)) {
-    _.each(DEPS_GROUPS, ({ name }) => args[name] = true);
+if (_.every(DEPS_GROUPS, ({ name }) => opts[name] === undefined)) {
+    _.each(DEPS_GROUPS, ({ name }) => opts[name] = true);
 }
 
 (async function main() {
@@ -55,17 +60,20 @@ if (_.every(DEPS_GROUPS, ({ name }) => args[name] === undefined)) {
     // TODO: allow to specify database url as command line argument
     fetchRemoteDb(DEFAULT_REMOTE_CHANGELOGS_DB_URL);
 
-    const depsGroupsToCheck = _.filter(DEPS_GROUPS, ({ name }) => !!args[name]);
+    const depsGroupsToCheck = _.filter(DEPS_GROUPS, ({ name }) => !!opts[name]);
     const depsGroupsToCheckStr = (depsGroupsToCheck.length === DEPS_GROUPS.length) ?
         '' : `${_.pluck(depsGroupsToCheck, 'name').join(' and ')} `;
 
     console.log(`Checking for outdated ${depsGroupsToCheckStr}dependencies for "${strong(packageFile)}"...`);
     let updatedModules = await ncu.run({
         packageFile,
-        prod: args.production,
-        dev: args.development,
-        optional: args.optional
+        prod: opts.production,
+        dev: opts.development,
+        optional: opts.optional
     });
+
+    // Filtering deps
+    updatedModules = _.pick(updatedModules, (newVersion, moduleName) => filterModuleName(moduleName));
 
     if (_.isEmpty(updatedModules)) {
         return console.log(`All dependencies are up-to-date!`);
