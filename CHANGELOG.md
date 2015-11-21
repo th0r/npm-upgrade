@@ -10,6 +10,13 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.6.0
+
+ * **New Feature**
+  * Added `filter` CLI argument (see [Usage](README.md#usage) section in `README.md`)
+ * **Internal**
+  * Update deps
+
 ## 0.5.1
 
  * **Bug Fix**
