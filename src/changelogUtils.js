@@ -5,7 +5,7 @@ import got from 'got';
 import { getModuleInfo } from './packageUtils';
 import { getRepositoryInfo } from './repositoryUtils';
 
-const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'CHANGES.md'];
+const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'CHANGES.md', 'CHANGELOG'];
 
 export const fetchRemoteDb = _.memoize(async url => {
     try {
