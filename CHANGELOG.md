@@ -10,6 +10,11 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.6.1
+
+ * **Improvement**
+  * Add `CHANGELOG` to the list of common changelog files
+
 ## 0.6.0
 
  * **New Feature**
