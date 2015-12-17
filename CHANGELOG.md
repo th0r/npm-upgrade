@@ -10,6 +10,11 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.6.2
+
+ * **Bug Fix**
+  * Fixes #5: Changelogs do not work anymore
+
 ## 0.6.1
 
  * **Improvement**
