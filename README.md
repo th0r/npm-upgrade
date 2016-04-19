@@ -1,5 +1,5 @@
 # npm-upgrade
-Interactive CLI utility to easily update outdated NPM dependencies
+Interactive CLI utility to easily update outdated NPM dependencies with changelogs inspection support.
 
 [![NPM version][npm-image]][npm-url] [![Downloads][downloads-image]][npm-url]
 
