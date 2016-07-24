@@ -96,6 +96,7 @@ if (_.every(DEPS_GROUPS, ({ name }) => opts[name] === undefined)) {
     console.log(`\nNew versions of modules available:\n\n${updatedTable}`);
 
     let packageUpdated = false;
+    let isUpdateFinished = false;
     do {
         const outdatedModule = updatedModules.shift();
         const { name, from, to } = outdatedModule;
@@ -114,7 +115,8 @@ if (_.every(DEPS_GROUPS, ({ name }) => opts[name] === undefined)) {
                     { name: 'Show changelog', value: 'changelog' },
                 // Show this if we haven't found changelog
                 (changelogUrl === null && homepage !== null) &&
-                    { name: 'Open homepage', value: 'homepage' }
+                    { name: 'Open homepage', value: 'homepage' },
+                { name: 'Finish update process', value: 'finish' }
             ]),
             // Automatically setting cursor to "Open homepage" after we haven't found changelog
             default: (changelogUrl === null && homepage === undefined) ? 2 : 0
@@ -159,13 +161,17 @@ if (_.every(DEPS_GROUPS, ({ name }) => opts[name] === undefined)) {
                 }
                 break;
 
+            case 'finish':
+                isUpdateFinished = true;
+                break;
+
             case true:
                 packageUpdated = true;
                 setModuleVersion(name, to, packageJson);
                 break;
         }
 
-    } while (updatedModules.length);
+    } while (updatedModules.length && !isUpdateFinished);
 
     // Adds new line
     console.log('');
