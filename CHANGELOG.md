@@ -10,6 +10,12 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 0.7.0
+ * **New Feature**
+  * Ability to finish upgrade process on every step
+ * **Bug Fix**
+  * Fix npm loader shown during upgrade process
+
 ## 0.6.2
 
  * **Bug Fix**
