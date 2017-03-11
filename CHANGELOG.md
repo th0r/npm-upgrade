@@ -10,9 +10,19 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.0.0
+
+ * **New Feature**
+  * Ignore modules feature
+
+ * **Internal**
+  * Update deps
+
 ## 0.7.0
+
  * **New Feature**
   * Ability to finish upgrade process on every step
+
  * **Bug Fix**
   * Fix npm loader shown during upgrade process
 
@@ -30,6 +40,7 @@ _Note: Gaps between patch versions are faulty, broken or test releases._
 
  * **New Feature**
   * Added `filter` CLI argument (see [Usage](README.md#usage) section in `README.md`)
+
  * **Internal**
   * Update deps
 
@@ -53,11 +64,13 @@ _Note: Gaps between patch versions are faulty, broken or test releases._
 
  * **Breaking Change**
   * Changelog URLs database have been moved from `data/homepages.json` to `db/changelogUrls.json`
+
  * **Improvement**
   * Utility now tries to find changelog URL for modules hosted on GitHub.
     It will check for some common changelog filenames like `CHANGELOG.md`, `History.md` etc. and
     open them in browser if they are present in the repository.
     If not, it will open project's `releases` page.
+
  * **New Feature**
   * Added dev CLI utility to easily add module's changelog URL to the database (`tools/addModuleChangelogUrlToDb.js`).
     Run it without arguments for more info.
@@ -71,5 +84,6 @@ _Note: Gaps between patch versions are faulty, broken or test releases._
 
  * **New Feature**
   * Colorize new/old module versions diff.
+
  * **Internal**
   * Split code into ES2015 modules.

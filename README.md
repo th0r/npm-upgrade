@@ -19,7 +19,7 @@ npm i -g npm-upgrade
 ```
 
 ## Usage
-Run `npm-upgrade [options] [filter]` in the root directory of your Node.js project (it must contain `package.json` that you want to update):
+Run `npm-upgrade [filter] [options]` in the root directory of your Node.js project (it must contain `package.json` that you want to update):
 ```sh
 cd ~/my-projects/my-node-project
 npm-upgrade
@@ -41,7 +41,6 @@ npm-upgrade '!*babel*'
 
 # You can combine including and excluding rules:
 npm-upgrade '*babel* !babel-transform-* !babel-preset-*'
-
 ```
 
 Use `Ctrl-C` to exit if you changed your mind.
