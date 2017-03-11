@@ -1,0 +1,8 @@
+{
+  "ignore": {
+    "npm": {
+      "versions": "*",
+      "reason": "Must match version that `npm-check-updates` uses"
+    }
+  }
+}
