@@ -31,17 +31,18 @@ export const handler = catchAsyncError(async (opts) => {
     }
   }
 
-  if (invalidModules.length) {
+  if (!modulesToReset.length || invalidModules.length) {
     modulesToReset = await askUser({
       type: 'checkbox',
       message: 'Select ignored modules to reset:',
       choices: ignoredModules,
       default: modulesToReset
     });
+    console.log();
   }
 
   if (!modulesToReset.length) {
-    return console.log('Nothing to reset');
+    return console.log(attention('Nothing to reset'));
   }
 
   console.log(
