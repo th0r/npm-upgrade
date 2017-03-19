@@ -3,7 +3,7 @@ import { createIgnoredModulesTable } from '../ignore';
 import Config from '../../Config';
 
 export const command = 'list';
-export const describe = 'List ignored modules';
+export const describe = 'Show the list of ignored modules';
 
 export const handler = catchAsyncError(async () => {
   const config = new Config();

@@ -7,7 +7,7 @@ import { createIgnoredModulesTable } from '../ignore';
 import Config from '../../Config';
 
 export const command = 'reset [modules...]';
-export const describe = 'Choose ignored modules to reset';
+export const describe = 'Reset ignored modules';
 
 export const handler = catchAsyncError(async (opts) => {
   let { modules: modulesToReset } = opts;

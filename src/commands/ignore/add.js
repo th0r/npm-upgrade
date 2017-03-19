@@ -9,7 +9,7 @@ import Config from '../../Config';
 import { DEPS_GROUPS, loadPackageJson, getModuleVersion } from '../../packageUtils';
 
 export const command = 'add [module]';
-export const describe = 'Add module to ignored';
+export const describe = 'Add module to ignored list';
 
 export const handler = catchAsyncError(async (opts) => {
   let { module: moduleName } = opts;
