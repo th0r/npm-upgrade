@@ -10,6 +10,16 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.0.2
+
+ * **Bug Fix**
+  * Fix `ignore reset` command
+  * Remove irrelevant `webpack` changelog url from db
+
+ * **Internal**
+  * Use `babel-preset-env` instead of `babel-preset-es2015`
+  * Update deps
+
 ## 1.0.1
 
  * **New Feature**
