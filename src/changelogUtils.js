@@ -5,9 +5,14 @@ import got from 'got';
 import { getModuleInfo } from './packageUtils';
 import { getRepositoryInfo } from './repositoryUtils';
 
-const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'CHANGES.md', 'CHANGELOG'];
+const pkg = require('../package.json');
 
-export const fetchRemoteDb = _.memoize(async url => {
+const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'CHANGES.md', 'CHANGELOG'];
+const CURRENT_REPOSITORY_ID = getRepositoryInfo(pkg.repository.url).repositoryId;
+const DEFAULT_REMOTE_CHANGELOGS_DB_URL =
+  `https://raw.githubusercontent.com/${CURRENT_REPOSITORY_ID}/master/db/changelogUrls.json`;
+
+export const fetchRemoteDb = _.memoize(async (url = DEFAULT_REMOTE_CHANGELOGS_DB_URL) => {
   try {
     const response = await got(url, { json: true });
 
@@ -17,7 +22,7 @@ export const fetchRemoteDb = _.memoize(async url => {
   }
 });
 
-export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUrl) {
+export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUrl = DEFAULT_REMOTE_CHANGELOGS_DB_URL) {
   let changelogUrls;
 
   if (remoteChangelogUrlsDbUrl) {

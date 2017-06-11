@@ -60,14 +60,13 @@ export function getModuleHomepage(packageJson) {
 export const getModuleInfo = _.memoize(async moduleName =>
   await new Promise((resolve, reject) => {
     try {
-      // This function is only supposed to run after `npm-check-updates`, so we don't need to call `npm.load()` here
-      npm.commands.view([moduleName], true, (err, moduleInfo) => {
-        if (err) {
-          reject(err);
-        } else {
+      npm.load({ silent: true }, err => {
+        if (err) reject(err);
+        npm.commands.view([moduleName], true, (err, moduleInfo) => {
+          if (err) reject(err);
           // `moduleInfo` contains object `{ <version>: <info> }`, so we should extract info from there
           resolve(_.values(moduleInfo)[0]);
-        }
+        });
       });
     } catch (err) {
       reject(err);

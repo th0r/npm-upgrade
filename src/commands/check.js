@@ -11,7 +11,6 @@ import * as npmProgress from '../npmProgress';
 import { makeFilterFunction } from '../filterUtils';
 import { DEPS_GROUPS, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
 import { fetchRemoteDb, findModuleChangelogUrl } from '../changelogUtils';
-import { getRepositoryInfo } from '../repositoryUtils';
 import { createSimpleTable } from '../cliTable';
 import { strong, success, attention } from '../cliStyles';
 import askUser from '../askUser';
@@ -19,10 +18,6 @@ import { askIgnoreFields } from './ignore';
 import Config from '../Config';
 
 const pkg = require('../../package.json');
-
-const CURRENT_REPOSITORY_ID = getRepositoryInfo(pkg.repository.url).repositoryId;
-const DEFAULT_REMOTE_CHANGELOGS_DB_URL =
-  `https://raw.githubusercontent.com/${CURRENT_REPOSITORY_ID}/master/db/changelogUrls.json`;
 
 function createUpdatedModulesTable(modules) {
   return createSimpleTable(
@@ -64,7 +59,7 @@ export const handler = catchAsyncError(async opts => {
   let { path: packageFile, content: packageJson } = loadPackageJson();
 
   // Fetching remote changelogs db in background
-  fetchRemoteDb(DEFAULT_REMOTE_CHANGELOGS_DB_URL);
+  fetchRemoteDb();
 
   const depsGroupsToCheck = _.filter(depsCliOptions, ({ name }) => !!opts[name]);
   const depsGroupsToCheckStr = (depsGroupsToCheck.length === depsCliOptions.length) ?
@@ -179,7 +174,7 @@ export const handler = catchAsyncError(async opts => {
         if (changelogUrl === undefined) {
           console.log('Trying to find changelog URL...');
           changelogUrl =
-            outdatedModule.changelogUrl = await findModuleChangelogUrl(name, DEFAULT_REMOTE_CHANGELOGS_DB_URL);
+            outdatedModule.changelogUrl = await findModuleChangelogUrl(name);
         }
 
         if (changelogUrl) {

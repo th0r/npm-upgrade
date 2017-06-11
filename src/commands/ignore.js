@@ -11,9 +11,6 @@ export const builder = yargs =>
   yargs
     .commandDir('ignore')
     .demandCommand(1, 'Provide valid command');
-export const handler = opts => {
-  console.log(opts);
-};
 
 export function createIgnoredModulesTable(ignoredModulesConfig, moduleNames = _.keys(ignoredModulesConfig)) {
   const rows = moduleNames.map(moduleName => [

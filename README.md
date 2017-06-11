@@ -22,8 +22,9 @@ npm i -g npm-upgrade
 This utility is supposed to be run in the root directory of your Node.js project (that contains `package.json`).
 Run `npm-upgrade --help` to see all available top-level commands:
 ```
-check [filter]    Check for outdated modules
-ignore <command>  Manage ignored modules
+check [filter]          Check for outdated modules
+ignore <command>        Manage ignored modules
+changelog <moduleName>  Show changelog for a module
 ```
 Run `npm-upgrade <command> --help` to see usage help for corresponding command.
 `check` is the default command and can be omitted so running `npm-upgrade [filter]` is the same as `npm-upgrade check [filter]`.
@@ -41,7 +42,7 @@ Update "@angular/common" in package.json from 2.4.8 to 2.4.10? (Use arrow keys)
 ```
 * `Yes` will update `@angular/common` version in `package.json` to `2.4.10`, but not immediately (see explanation below)
 * `No` will not update this module version.
-* `Show changelog` will try to find changelog url for the current module and open it in the default browser.
+* `Show changelog` will try to find changelog url for the current module and open it in default browser.
 * `Ignore` will add this module to the ignored list (see details in [`Ignoring module`](#ignoring-module) section below).
 * `Finish update process` will ...hm... finish update process and save all the changes to `package.json`.
 
@@ -64,7 +65,7 @@ npm-upgrade '!*babel*'
 npm-upgrade '*babel* !babel-transform-* !babel-preset-*'
 ```
 
-If you want to check only a group of deps use these options: 
+If you want to check only a group of deps use these options:
 ```
 -p, --production   Check only "dependencies"
 -d, --development  Check only "devDependencies"
@@ -100,6 +101,12 @@ Commands:
 * `add` - will add a module from your deps to ignored list. You can either provide module name as optional `module` argument or interactively select it from the list of project's deps.
 * `list` - will show the list of currently ignored modules along with their ignored versions and reasons.
 * `reset` - will remove modules from the ignored list. You can either provide module names as `modules` argument (separated by space) or interactively select them from the list of project's deps.
+
+### `changelog` command
+```
+npm-upgrade changelog <moduleName>
+```
+Will try to find changelog url for provided module and open it in default browser.
 
 ## Troubleshooting
 **Wrong changelog shown for _\<moduleName\>_ or not shown at all!**
