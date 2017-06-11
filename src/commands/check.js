@@ -82,7 +82,7 @@ export const handler = catchAsyncError(async opts => {
     optional: opts.optional
   });
 
-  const latestVersions = await ncu.getLatestVersions(currentVersions, { versionTarget: 'latest' });
+  const latestVersions = await ncu.queryVersions(currentVersions, { versionTarget: 'latest' });
   let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
   npmProgress.disable();
 
