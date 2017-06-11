@@ -16,7 +16,7 @@
   "main": "./lib/bin/cli.js",
   "bin": "./lib/bin/cli.js",
   "scripts": {
-    "prepublish": "gulp build"
+    "prepare": "gulp build"
   },
   "engines": {
     "node": ">=4"
