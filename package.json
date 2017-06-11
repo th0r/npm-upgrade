@@ -29,7 +29,7 @@
     "cli-table": "0.3.1",
     "del": "2.2.2",
     "got": "6.7.1",
-    "inquirer": "3.0.6",
+    "inquirer": "3.1.0",
     "lodash": "4.17.4",
     "npm": "^3.10.6",
     "npm-check-updates": "2.11.3",
