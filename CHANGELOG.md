@@ -10,6 +10,15 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.0.4
+
+ * **Bug Fix**
+  * Fix Node 8 compatibility issue
+
+ * **Internal**
+  * Use `prepare` npm script instead of `prepublish`
+  * Update `inquirer`
+
 ## 1.0.2
 
  * **Bug Fix**
