@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.2.0
+ * **Internal**
+   * Update deps
+
 ## 1.1.0
  * **New Feature**
    * Added `changelog` command
