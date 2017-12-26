@@ -10,6 +10,14 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.3.0
+ * **New Feature**
+   * Show list of packages that will be updated in the end of upgrade process (#18)
+
+ * **Internal**
+   * Drop support for Node 4
+   * Update deps
+
 ## 1.2.0
  * **Internal**
    * Update deps
