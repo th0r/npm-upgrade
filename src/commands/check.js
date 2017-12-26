@@ -56,7 +56,7 @@ export const handler = catchAsyncError(async opts => {
   }
 
   // Loading `package.json` from the current directory
-  let { path: packageFile, content: packageJson } = loadPackageJson();
+  const { path: packageFile, content: packageJson } = loadPackageJson();
 
   // Fetching remote changelogs db in background
   fetchRemoteDb();
@@ -136,7 +136,7 @@ export const handler = catchAsyncError(async opts => {
     console.log(`\n${strong('Ignored updates:')}\n\n${createSimpleTable(rows)}`);
   }
 
-  let packageUpdated = false;
+  const updatedModules = [];
   let isUpdateFinished = false;
   while (modulesToUpdate.length && !isUpdateFinished) {
     const outdatedModule = modulesToUpdate.shift();
@@ -217,7 +217,7 @@ export const handler = catchAsyncError(async opts => {
         break;
 
       case true:
-        packageUpdated = true;
+        updatedModules.push(outdatedModule);
         setModuleVersion(name, to, packageJson);
         delete config.ignore[name];
         break;
@@ -231,19 +231,27 @@ export const handler = catchAsyncError(async opts => {
   // Saving config
   config.save();
 
-  if (!packageUpdated) {
+  if (!updatedModules.length) {
     console.log('Nothing to update');
     return;
   }
 
-  packageJson = JSON.stringify(packageJson, null, 2);
-  console.log(`New package.json:\n\n${packageJson}\n`);
+  // Showing the list of modules that are going to be updated
+  console.log(
+    `\n${strong('These packages will be updated:')}\n\n` +
+    createUpdatedModulesTable(updatedModules) +
+    '\n'
+  );
+
   const shouldUpdatePackageFile = await askUser(
     { type: 'confirm', message: 'Update package.json?', default: true }
   );
 
   if (shouldUpdatePackageFile) {
-    // Adding newline to the end of file
-    writeFileSync(packageFile, `${packageJson}\n`);
+    writeFileSync(
+      packageFile,
+      // Adding newline to the end of file
+      `${JSON.stringify(packageJson, null, 2)}\n`
+    );
   }
 });
