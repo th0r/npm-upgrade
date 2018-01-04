@@ -43,14 +43,10 @@
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-env": "1.6.1",
     "babel-preset-stage-2": "6.24.1",
-    "bun": "0.0.12",
     "eslint": "3.19.0",
     "eslint-plugin-babel": "4.1.2",
-    "gulp": "3.9.1",
-    "gulp-babel": "7.0.0",
-    "gulp-plumber": "1.1.0",
-    "gulp-util": "3.0.8",
-    "gulp-watch": "4.3.11"
+    "gulp": "4.0.0",
+    "gulp-babel": "7.0.0"
   },
   "files": [
     "lib",
