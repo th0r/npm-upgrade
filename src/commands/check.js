@@ -45,6 +45,7 @@ export function builder(yargs) {
     );
 }
 
+/* eslint complexity: "off" */
 export const handler = catchAsyncError(async opts => {
   const { filter } = opts;
   // Making function that will filter out deps by module name
