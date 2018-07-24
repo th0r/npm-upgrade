@@ -1,27 +1,27 @@
-import { writeFileSync } from 'fs';
+import {writeFileSync} from 'fs';
 
 import _ from 'lodash';
 import opener from 'opener';
 import semver from 'semver';
 import ncu from 'npm-check-updates';
-import { colorizeDiff } from 'npm-check-updates/lib/version-util';
+import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
 import * as npmProgress from '../npmProgress';
-import { makeFilterFunction } from '../filterUtils';
-import { DEPS_GROUPS, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage } from '../packageUtils';
-import { fetchRemoteDb, findModuleChangelogUrl } from '../changelogUtils';
-import { createSimpleTable } from '../cliTable';
-import { strong, success, attention } from '../cliStyles';
+import {makeFilterFunction} from '../filterUtils';
+import {DEPS_GROUPS, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
+import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
+import {createSimpleTable} from '../cliTable';
+import {strong, success, attention} from '../cliStyles';
 import askUser from '../askUser';
-import { askIgnoreFields } from './ignore';
+import {askIgnoreFields} from './ignore';
 import Config from '../Config';
 
 const pkg = require('../../package.json');
 
 function createUpdatedModulesTable(modules) {
   return createSimpleTable(
-    _.map(modules, ({ name, from, to }) => [
+    _.map(modules, ({name, from, to}) => [
       strong(name),
       from, '→', colorizeDiff(to, from)
     ])
@@ -36,7 +36,7 @@ const depsCliOptions = DEPS_GROUPS.filter(group => group.cliOption);
 
 export function builder(yargs) {
   depsCliOptions
-    .forEach(({ name, field }) =>
+    .forEach(({name, field}) =>
       yargs.option(name, {
         type: 'boolean',
         alias: name[0],
@@ -47,22 +47,22 @@ export function builder(yargs) {
 
 /* eslint complexity: "off" */
 export const handler = catchAsyncError(async opts => {
-  const { filter } = opts;
+  const {filter} = opts;
   // Making function that will filter out deps by module name
   const filterModuleName = makeFilterFunction(filter);
 
   // Checking all the deps if all of them are omitted
-  if (_.every(depsCliOptions, ({ name }) => opts[name] === false)) {
-    _.each(depsCliOptions, ({ name }) => (opts[name] = true));
+  if (_.every(depsCliOptions, ({name}) => opts[name] === false)) {
+    _.each(depsCliOptions, ({name}) => (opts[name] = true));
   }
 
   // Loading `package.json` from the current directory
-  const { path: packageFile, content: packageJson } = loadPackageJson();
+  const {path: packageFile, content: packageJson} = loadPackageJson();
 
   // Fetching remote changelogs db in background
   fetchRemoteDb();
 
-  const depsGroupsToCheck = _.filter(depsCliOptions, ({ name }) => !!opts[name]);
+  const depsGroupsToCheck = _.filter(depsCliOptions, ({name}) => !!opts[name]);
   const depsGroupsToCheckStr = (depsGroupsToCheck.length === depsCliOptions.length) ?
     '' : `${_.map(depsGroupsToCheck, 'name').join(' and ')} `;
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
@@ -78,7 +78,7 @@ export const handler = catchAsyncError(async opts => {
     optional: opts.optional
   });
 
-  const latestVersions = await ncu.queryVersions(currentVersions, { versionTarget: 'latest' });
+  const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest'});
   let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
   npmProgress.disable();
 
@@ -121,7 +121,7 @@ export const handler = catchAsyncError(async opts => {
   }
 
   if (!_.isEmpty(ignoredModules)) {
-    const rows = _.map(ignoredModules, ({ name, from, to }) => [
+    const rows = _.map(ignoredModules, ({name, from, to}) => [
       strong(name),
       from, '→', colorizeDiff(to, from),
       attention(config.ignore[name].versions),
@@ -141,8 +141,8 @@ export const handler = catchAsyncError(async opts => {
   let isUpdateFinished = false;
   while (modulesToUpdate.length && !isUpdateFinished) {
     const outdatedModule = modulesToUpdate.shift();
-    const { name, from, to } = outdatedModule;
-    let { changelogUrl, homepage } = outdatedModule;
+    const {name, from, to} = outdatedModule;
+    let {changelogUrl, homepage} = outdatedModule;
 
     // Adds new line
     console.log('');
@@ -152,16 +152,16 @@ export const handler = catchAsyncError(async opts => {
       message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" in package.json ` +
       `from ${from} to ${colorizeDiff(to, from)}?`,
       choices: _.compact([
-        { name: 'Yes', value: true },
-        { name: 'No', value: false },
+        {name: 'Yes', value: true},
+        {name: 'No', value: false},
         // Don't show this option if we couldn't find module's changelog url
         (changelogUrl !== null) &&
-        { name: 'Show changelog', value: 'changelog' },
+        {name: 'Show changelog', value: 'changelog'},
         // Show this if we haven't found changelog
         (changelogUrl === null && homepage !== null) &&
-        { name: 'Open homepage', value: 'homepage' },
-        { name: 'Ignore', value: 'ignore' },
-        { name: 'Finish update process', value: 'finish' }
+        {name: 'Open homepage', value: 'homepage'},
+        {name: 'Ignore', value: 'ignore'},
+        {name: 'Finish update process', value: 'finish'}
       ]),
       // Automatically setting cursor to "Open homepage" after we haven't found changelog
       default: (changelogUrl === null && homepage === undefined) ? 2 : 0
@@ -208,8 +208,8 @@ export const handler = catchAsyncError(async opts => {
         break;
 
       case 'ignore': {
-        const { versions, reason } = await askIgnoreFields(latestVersions[name]);
-        config.ignore[name] = { versions, reason };
+        const {versions, reason} = await askIgnoreFields(latestVersions[name]);
+        config.ignore[name] = {versions, reason};
         break;
       }
 
@@ -245,7 +245,7 @@ export const handler = catchAsyncError(async opts => {
   );
 
   const shouldUpdatePackageFile = await askUser(
-    { type: 'confirm', message: 'Update package.json?', default: true }
+    {type: 'confirm', message: 'Update package.json?', default: true}
   );
 
   if (shouldUpdatePackageFile) {

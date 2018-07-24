@@ -2,15 +2,15 @@ import _ from 'lodash';
 
 import catchAsyncError from '../../catchAsyncError';
 import askUser from '../../askUser';
-import { success, strong, attention } from '../../cliStyles';
-import { createIgnoredModulesTable } from '../ignore';
+import {success, strong, attention} from '../../cliStyles';
+import {createIgnoredModulesTable} from '../ignore';
 import Config from '../../Config';
 
 export const command = 'reset [modules...]';
 export const describe = 'Reset ignored modules';
 
 export const handler = catchAsyncError(async (opts) => {
-  let { modules: modulesToReset } = opts;
+  let {modules: modulesToReset} = opts;
   let invalidModules = [];
   const config = new Config();
   const ignoredModules = _.keys(config.ignore);

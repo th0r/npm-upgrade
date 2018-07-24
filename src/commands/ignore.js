@@ -2,8 +2,8 @@ import _ from 'lodash';
 import semver from 'semver';
 
 import askUser from '../askUser';
-import { createSimpleTable } from '../cliTable';
-import { strong, attention } from '../cliStyles';
+import {createSimpleTable} from '../cliTable';
+import {strong, attention} from '../cliStyles';
 
 export const command = 'ignore <command>';
 export const describe = 'Manage ignored modules';
@@ -22,7 +22,7 @@ export function createIgnoredModulesTable(ignoredModulesConfig, moduleNames = _.
   // Table header
   rows.unshift(['', 'Ignored versions', 'Reason'].map(header => strong(header)));
 
-  return createSimpleTable(rows, { colAligns: 'lcl' });
+  return createSimpleTable(rows, {colAligns: 'lcl'});
 }
 
 export async function askIgnoreFields(defaultVersions) {
@@ -32,6 +32,6 @@ export async function askIgnoreFields(defaultVersions) {
       default: defaultVersions,
       validate: input => (semver.validRange(input) ? true : 'Input valid semver version range')
     }),
-    reason: await askUser({ message: 'Ignore reason' })
+    reason: await askUser({message: 'Ignore reason'})
   };
 }

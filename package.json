@@ -40,11 +40,12 @@
   },
   "devDependencies": {
     "babel-core": "6.26.0",
-    "babel-eslint": "8.2.1",
+    "babel-eslint": "8.2.2",
     "babel-plugin-transform-runtime": "6.23.0",
     "babel-preset-env": "1.6.1",
     "babel-preset-stage-2": "6.24.1",
-    "eslint": "4.16.0",
+    "eslint": "4.19.1",
+    "eslint-config-th0r": "1.0.1",
     "gulp": "4.0.0",
     "gulp-babel": "7.0.0"
   },

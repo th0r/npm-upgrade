@@ -1,4 +1,4 @@
-import { parse as parseUrl } from 'url';
+import {parse as parseUrl} from 'url';
 
 import _ from 'lodash';
 
@@ -17,7 +17,7 @@ const KNOWN_REPOSITORIES = {
 
 export function getRepositoryInfo(repositoryUrl) {
   const parsedUrl = parseUrl(repositoryUrl);
-  const { hostname } = parsedUrl;
+  const {hostname} = parsedUrl;
 
   return _.has(KNOWN_REPOSITORIES, hostname) ? KNOWN_REPOSITORIES[hostname](parsedUrl) : null;
 }

@@ -1,5 +1,5 @@
 import catchAsyncError from '../../catchAsyncError';
-import { createIgnoredModulesTable } from '../ignore';
+import {createIgnoredModulesTable} from '../ignore';
 import Config from '../../Config';
 
 export const command = 'list';

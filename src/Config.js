@@ -1,5 +1,5 @@
-import { resolve } from 'path';
-import { writeFileSync } from 'fs';
+import {resolve} from 'path';
+import {writeFileSync} from 'fs';
 import del from 'del';
 
 import _ from 'lodash';
@@ -14,7 +14,7 @@ const getData = Symbol('getData');
 export default class Config {
 
   constructor(opts) {
-    const { projectRoot } = opts || {};
+    const {projectRoot} = opts || {};
     this[path] = resolve(projectRoot || process.cwd(), PROJECT_CONFIG_FILENAME);
     this[storedData] = this[read]();
     _.assign(
@@ -56,7 +56,7 @@ export default class Config {
   }
 
   [getData]() {
-    const data = { ...this };
+    const data = {...this};
     return cleanDeep(data);
   }
 

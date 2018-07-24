@@ -1,13 +1,13 @@
-import { resolve } from 'path';
+import {resolve} from 'path';
 
 import _ from 'lodash';
 import npm from 'npm';
 
 export const DEPS_GROUPS = [
-  { name: 'production', field: 'dependencies', cliOption: true },
-  { name: 'optional', field: 'optionalDependencies', cliOption: true },
-  { name: 'development', field: 'devDependencies', cliOption: true },
-  { name: 'peer', field: 'peerDependencies', cliOption: false }
+  {name: 'production', field: 'dependencies', cliOption: true},
+  {name: 'optional', field: 'optionalDependencies', cliOption: true},
+  {name: 'development', field: 'devDependencies', cliOption: true},
+  {name: 'peer', field: 'peerDependencies', cliOption: false}
 ];
 
 export function loadPackageJson() {
@@ -21,7 +21,7 @@ export function loadPackageJson() {
     process.exit(1);
   }
 
-  return { path: packageFile, content: packageJson };
+  return {path: packageFile, content: packageJson};
 }
 
 export function findModuleDepsGroup(moduleName, packageJson) {
@@ -60,7 +60,7 @@ export function getModuleHomepage(packageJson) {
 export const getModuleInfo = _.memoize(async moduleName =>
   await new Promise((resolve, reject) => {
     try {
-      npm.load({ silent: true }, err => {
+      npm.load({silent: true}, err => {
         if (err) reject(err);
         npm.commands.view([moduleName], true, (err, moduleInfo) => {
           if (err) reject(err);

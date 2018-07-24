@@ -14,7 +14,7 @@ export function createSimpleTable(rows, opts = {}) {
   }
 
   const table = new Table({
-    style: { 'padding-left': 2 },
+    style: {'padding-left': 2},
     colAligns: ['left', 'right', 'right', 'right', 'middle'],
     chars: {
       'top': '',

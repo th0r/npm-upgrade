@@ -1,18 +1,18 @@
 import _ from 'lodash';
-import { Separator } from 'inquirer';
+import {Separator} from 'inquirer';
 
 import catchAsyncError from '../../catchAsyncError';
 import askUser from '../../askUser';
-import { strong, success, attention } from '../../cliStyles';
-import { createIgnoredModulesTable, askIgnoreFields } from '../ignore';
+import {strong, success, attention} from '../../cliStyles';
+import {createIgnoredModulesTable, askIgnoreFields} from '../ignore';
 import Config from '../../Config';
-import { DEPS_GROUPS, loadPackageJson, getModuleVersion } from '../../packageUtils';
+import {DEPS_GROUPS, loadPackageJson, getModuleVersion} from '../../packageUtils';
 
 export const command = 'add [module]';
 export const describe = 'Add module to ignored list';
 
 export const handler = catchAsyncError(async (opts) => {
-  let { module: moduleName } = opts;
+  let {module: moduleName} = opts;
   const config = new Config();
   config.ignore = config.ignore || {};
 
@@ -54,7 +54,7 @@ export const handler = catchAsyncError(async (opts) => {
 });
 
 function makeModulesToIgnoreList(ignoredModulesConfig) {
-  const { content: packageJson } = loadPackageJson();
+  const {content: packageJson} = loadPackageJson();
   const ignoredModules = _.keys(ignoredModulesConfig);
 
   return _.transform(DEPS_GROUPS, (list, group) => {

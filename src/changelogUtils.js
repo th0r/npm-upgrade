@@ -2,8 +2,8 @@ import Bluebird from 'bluebird';
 import _ from 'lodash';
 import got from 'got';
 
-import { getModuleInfo } from './packageUtils';
-import { getRepositoryInfo } from './repositoryUtils';
+import {getModuleInfo} from './packageUtils';
+import {getRepositoryInfo} from './repositoryUtils';
 
 const pkg = require('../package.json');
 
@@ -14,7 +14,7 @@ const DEFAULT_REMOTE_CHANGELOGS_DB_URL =
 
 export const fetchRemoteDb = _.memoize(async (url = DEFAULT_REMOTE_CHANGELOGS_DB_URL) => {
   try {
-    const response = await got(url, { json: true });
+    const response = await got(url, {json: true});
 
     return response.body;
   } catch (err) {
@@ -35,7 +35,7 @@ export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUr
     return changelogUrls[moduleName];
   }
 
-  const { changelog, repository } = await getModuleInfo(moduleName);
+  const {changelog, repository} = await getModuleInfo(moduleName);
 
   if (changelog) {
     return changelog;
@@ -44,7 +44,7 @@ export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUr
   if (repository && repository.url) {
     // If repository is located on one of known hostings, then we will try to request
     // some common changelog files from there or return URL for "Releases" page
-    const { fileUrlBuilder, releasesPageUrl } = getRepositoryInfo(repository.url) || {};
+    const {fileUrlBuilder, releasesPageUrl} = getRepositoryInfo(repository.url) || {};
 
     if (fileUrlBuilder) {
       const possibleChangelogUrls = _.map(COMMON_CHANGELOG_FILES, fileUrlBuilder);

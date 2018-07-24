@@ -1,15 +1,15 @@
 import opener from 'opener';
 
 import catchAsyncError from '../catchAsyncError';
-import { findModuleChangelogUrl } from '../changelogUtils';
-import { strong } from '../cliStyles';
+import {findModuleChangelogUrl} from '../changelogUtils';
+import {strong} from '../cliStyles';
 const pkg = require('../../package.json');
 
 export const command = 'changelog <moduleName>';
 export const describe = 'Show changelog for a module';
 
 export const handler = catchAsyncError(async opts => {
-  const { moduleName } = opts;
+  const {moduleName} = opts;
 
   console.log(`Trying to find changelog URL for ${strong(moduleName)}...`);
   let changelogUrl;

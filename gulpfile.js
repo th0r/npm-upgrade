@@ -22,5 +22,5 @@ function build() {
 }
 
 function watch() {
-  gulp.watch(SRC, { ignoreInitial: false }, build);
+  gulp.watch(SRC, {ignoreInitial: false}, build);
 }
