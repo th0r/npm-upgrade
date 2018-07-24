@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.4.0
+ * **Internal**
+   * Update deps
+
 ## 1.3.0
  * **New Feature**
    * Show list of packages that will be updated in the end of upgrade process (#18)
