@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 1.4.1
+ * **Improvement**
+   * Preserve indentation in `package.json` (#21, @cascornelissen)
+
 ## 1.4.0
  * **Internal**
    * Update deps
