@@ -3,6 +3,7 @@ import {writeFileSync} from 'fs';
 import _ from 'lodash';
 import opener from 'opener';
 import semver from 'semver';
+import detectIndent from 'detect-indent';
 import ncu from 'npm-check-updates';
 import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
@@ -57,7 +58,7 @@ export const handler = catchAsyncError(async opts => {
   }
 
   // Loading `package.json` from the current directory
-  const {path: packageFile, content: packageJson} = loadPackageJson();
+  const {path: packageFile, content: packageJson, source: packageSource} = loadPackageJson();
 
   // Fetching remote changelogs db in background
   fetchRemoteDb();
@@ -249,10 +250,12 @@ export const handler = catchAsyncError(async opts => {
   );
 
   if (shouldUpdatePackageFile) {
+    const {indent} = detectIndent(packageSource);
+
     writeFileSync(
       packageFile,
       // Adding newline to the end of file
-      `${JSON.stringify(packageJson, null, 2)}\n`
+      `${JSON.stringify(packageJson, null, indent)}\n`
     );
   }
 });
