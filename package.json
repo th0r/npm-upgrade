@@ -29,6 +29,7 @@
     "chalk": "2.4.1",
     "cli-table": "0.3.1",
     "del": "3.0.0",
+    "detect-indent": "5.0.0",
     "got": "8.3.2",
     "inquirer": "6.0.0",
     "lodash": "4.17.10",

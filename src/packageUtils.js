@@ -1,4 +1,5 @@
 import {resolve} from 'path';
+import {readFileSync} from 'fs';
 
 import _ from 'lodash';
 import npm from 'npm';
@@ -13,15 +14,17 @@ export const DEPS_GROUPS = [
 export function loadPackageJson() {
   const packageFile = resolve('./package.json');
   let packageJson;
+  let packageSource;
 
   try {
-    packageJson = require(packageFile);
+    packageSource = readFileSync(packageFile, 'utf-8');
+    packageJson = JSON.parse(packageSource);
   } catch (err) {
     console.error(`Error loading package.json: ${err.message}`);
     process.exit(1);
   }
 
-  return {path: packageFile, content: packageJson};
+  return {path: packageFile, content: packageJson, source: packageSource};
 }
 
 export function findModuleDepsGroup(moduleName, packageJson) {
