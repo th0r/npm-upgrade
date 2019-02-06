@@ -24,7 +24,9 @@ function createUpdatedModulesTable(modules) {
   return createSimpleTable(
     _.map(modules, ({name, from, to}) => [
       strong(name),
-      from, '→', colorizeDiff(to, from)
+      from,
+      '→',
+      colorizeDiff(to, from)
     ])
   );
 }
@@ -124,7 +126,9 @@ export const handler = catchAsyncError(async opts => {
   if (!_.isEmpty(ignoredModules)) {
     const rows = _.map(ignoredModules, ({name, from, to}) => [
       strong(name),
-      from, '→', colorizeDiff(to, from),
+      from,
+      '→',
+      colorizeDiff(to, from),
       attention(config.ignore[name].versions),
       config.ignore[name].reason
     ]);

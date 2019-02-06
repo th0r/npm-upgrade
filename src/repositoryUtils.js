@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 const KNOWN_REPOSITORIES = {
   'github.com': parsedRepositoryUrl => {
-    const repositoryId = /^(.+?\/.+?)(?:\/|\.git$|$)/.exec(parsedRepositoryUrl.pathname.slice(1))[1];
+    const repositoryId = /^(.+?\/.+?)(?:\/|\.git$|$)/u.exec(parsedRepositoryUrl.pathname.slice(1))[1];
     const rootUrl = `https://github.com/${repositoryId}`;
 
     return {

@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 export function globToRegexp(glob, flags) {
   const regexp = glob
-    .split(/\*+/)
+    .split(/\*+/u)
     .map(_.escapeRegExp)
     .join('.*?');
 
@@ -11,7 +11,7 @@ export function globToRegexp(glob, flags) {
 
 export function makeFilterFunction(filterStr = '') {
   let [excludeFilters, includeFilters] = _(filterStr)
-    .split(/\s+/)
+    .split(/\s+/u)
     .compact()
     .partition(filter => filter[0] === '!')
     .valueOf();
