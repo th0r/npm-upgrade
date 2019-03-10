@@ -12,6 +12,7 @@ import * as npmProgress from '../npmProgress';
 import {makeFilterFunction} from '../filterUtils';
 import {DEPS_GROUPS, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
+import {getModuleDiffUrl} from '../diffUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention} from '../cliStyles';
 import askUser from '../askUser';
@@ -79,6 +80,7 @@ export const handler = catchAsyncError(async opts => {
     optional: opts.optional
   });
 
+  const installedVersions = await ncu.getInstalledPackages();
   const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest'});
   let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
   npmProgress.disable();
@@ -144,6 +146,7 @@ export const handler = catchAsyncError(async opts => {
     const outdatedModule = modulesToUpdate.shift();
     const {name, from, to} = outdatedModule;
     let {changelogUrl, homepage} = outdatedModule;
+    const diffUrl = getModuleDiffUrl(name, installedVersions[name], latestVersions[name]);
 
     // Adds new line
     console.log('');
@@ -161,6 +164,7 @@ export const handler = catchAsyncError(async opts => {
         // Show this if we haven't found changelog
         (changelogUrl === null && homepage !== null) &&
         {name: 'Open homepage', value: 'homepage'},
+        diffUrl && {name: 'Show diff', value: 'diff'},
         {name: 'Ignore', value: 'ignore'},
         {name: 'Finish update process', value: 'finish'}
       ]),
@@ -169,6 +173,12 @@ export const handler = catchAsyncError(async opts => {
     });
 
     switch (answer) {
+      case 'diff':
+        modulesToUpdate.unshift(outdatedModule);
+        console.log(`Opening ${strong(diffUrl)}...`);
+        opener(diffUrl);
+        break;
+
       case 'changelog':
         // Ask user about this module again
         modulesToUpdate.unshift(outdatedModule);
