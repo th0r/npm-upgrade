@@ -108,6 +108,10 @@ export const handler = catchAsyncError(async opts => {
     ))
   )(upgradedVersions);
 
+  // Moving `@types/*` modules right below their original modules
+  sortModules(modulesToUpdate);
+  sortModules(ignoredModules);
+
   // Creating pretty-printed CLI tables with update info
   if (_.isEmpty(modulesToUpdate)) {
     console.log(
@@ -222,7 +226,6 @@ export const handler = catchAsyncError(async opts => {
         delete config.ignore[name];
         break;
     }
-
   }
 
   // Adds new line
@@ -257,3 +260,38 @@ export const handler = catchAsyncError(async opts => {
     );
   }
 });
+
+function sortModules(modules) {
+  const processedModules = new Set();
+
+  for (let i = 0, len = modules.length; i < len; i++) {
+    const module = modules[i];
+
+    if (processedModules.has(module)) {
+      continue;
+    }
+
+    const normalizedName = module.name.replace(/^@types\//u, '');
+
+    if (module.name === normalizedName) {
+      continue;
+    }
+
+    // Searching for corresponding module
+    const originalModuleIndex = modules.findIndex(({name}) => name === normalizedName);
+
+    if (originalModuleIndex === -1 || i === originalModuleIndex + 1) {
+      continue;
+    }
+
+    if (originalModuleIndex > i) {
+      modules.splice(originalModuleIndex + 1, 0, module);
+      modules.splice(i, 1);
+      processedModules.add(module);
+      i--;
+    } else {
+      modules.splice(i, 1);
+      modules.splice(originalModuleIndex + 1, 0, module);
+    }
+  }
+}
