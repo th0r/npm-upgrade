@@ -11,7 +11,7 @@ Take a look at this demo:
 ![npm-upgrade outdated packages](https://cloud.githubusercontent.com/assets/302213/11168821/08311b90-8bb2-11e5-9a71-5da73682ed44.gif)
 
 ## Installation
-First, install [Node.js](https://nodejs.org) (at least `v4`).
+First, install [Node.js](https://nodejs.org) (at least `v8.10`).
 
 Then install this utility as global npm-module:
 ```sh
