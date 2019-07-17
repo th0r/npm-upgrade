@@ -3,7 +3,7 @@ import {flow, split, compact, partition} from 'lodash/fp';
 
 export function globToRegexp(glob, flags) {
   const regexp = glob
-    .split(/\*+/u)
+    .split(/\*+/)
     .map(_.escapeRegExp)
     .join('.*?');
 
@@ -12,7 +12,7 @@ export function globToRegexp(glob, flags) {
 
 export function makeFilterFunction(filterStr = '') {
   let [excludeFilters, includeFilters] = flow(
-    split(/\s+/u),
+    split(/\s+/),
     compact,
     partition(filter => filter[0] === '!')
   )(filterStr);

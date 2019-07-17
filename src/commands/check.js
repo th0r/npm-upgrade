@@ -271,7 +271,7 @@ function sortModules(modules) {
       continue;
     }
 
-    const normalizedName = module.name.replace(/^@types\//u, '');
+    const normalizedName = module.name.replace(/^@types\//, '');
 
     if (module.name === normalizedName) {
       continue;

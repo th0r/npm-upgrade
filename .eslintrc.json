@@ -2,6 +2,7 @@
   "root": true,
   "extends": "th0r",
   "rules": {
-    "array-element-newline": "off"
+    "array-element-newline": "off",
+    "require-unicode-regexp": "off"
   }
 }
