@@ -1,8 +1,8 @@
 {
   "ignore": {
-    "npm": {
-      "versions": "*",
-      "reason": "Must match version that `npm-check-updates` uses"
+    "eslint": {
+      "versions": ">=6.0.0",
+      "reason": "^5 is required for 'eslint-config-th0r'"
     }
   }
 }

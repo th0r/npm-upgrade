@@ -1,4 +1,7 @@
 {
   "root": true,
-  "extends": "th0r"
+  "extends": "th0r",
+  "rules": {
+    "array-element-newline": "off"
+  }
 }

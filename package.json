@@ -17,38 +17,39 @@
   "bin": "./lib/bin/cli.js",
   "scripts": {
     "prepare": "gulp build",
+    "dev": "gulp watch",
     "lint": "eslint ."
   },
   "engines": {
-    "node": ">= 6"
+    "node": ">= 8"
   },
   "preferGlobal": true,
   "dependencies": {
-    "babel-runtime": "6.26.0",
-    "bluebird": "3.5.1",
-    "chalk": "2.4.1",
+    "@babel/runtime": "7.5.4",
+    "bluebird": "3.5.5",
+    "chalk": "2.4.2",
     "cli-table": "0.3.1",
-    "del": "3.0.0",
-    "detect-indent": "5.0.0",
-    "got": "8.3.2",
-    "inquirer": "6.0.0",
-    "lodash": "4.17.10",
-    "npm": "^3.10.6",
-    "npm-check-updates": "2.14.2",
-    "opener": "1.4.3",
-    "semver": "5.5.0",
-    "yargs": "12.0.1"
+    "del": "5.0.0",
+    "detect-indent": "6.0.0",
+    "got": "9.6.0",
+    "inquirer": "6.5.0",
+    "libnpmconfig": "1.2.1",
+    "lodash": "4.17.14",
+    "npm-check-updates": "3.1.20",
+    "opener": "1.5.1",
+    "pacote": "9.5.4",
+    "semver": "6.2.0",
+    "yargs": "13.3.0"
   },
   "devDependencies": {
-    "babel-core": "6.26.3",
-    "babel-eslint": "8.2.6",
-    "babel-plugin-transform-runtime": "6.23.0",
-    "babel-preset-env": "1.7.0",
-    "babel-preset-stage-2": "6.24.1",
-    "eslint": "4.19.1",
-    "eslint-config-th0r": "1.0.1",
-    "gulp": "4.0.0",
-    "gulp-babel": "7.0.1"
+    "@babel/core": "7.5.4",
+    "@babel/plugin-transform-runtime": "7.5.0",
+    "@babel/preset-env": "7.5.4",
+    "babel-eslint": "10.0.2",
+    "eslint": "5.16.0",
+    "eslint-config-th0r": "2.0.0",
+    "gulp": "4.0.2",
+    "gulp-babel": "8.0.0"
   },
   "files": [
     "lib",

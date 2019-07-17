@@ -8,7 +8,6 @@ import ncu from 'npm-check-updates';
 import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
-import * as npmProgress from '../npmProgress';
 import {makeFilterFunction} from '../filterUtils';
 import {DEPS_GROUPS, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
@@ -24,7 +23,7 @@ function createUpdatedModulesTable(modules) {
   return createSimpleTable(
     _.map(modules, ({name, from, to}) => [
       strong(name),
-      from, '→', colorizeDiff(to, from)
+      from, '→', colorizeDiff(from, to)
     ])
   );
 }
@@ -53,7 +52,7 @@ export const handler = catchAsyncError(async opts => {
   const filterModuleName = makeFilterFunction(filter);
 
   // Checking all the deps if all of them are omitted
-  if (_.every(depsCliOptions, ({name}) => opts[name] === false)) {
+  if (_.every(depsCliOptions, ({name}) => !opts[name])) {
     _.each(depsCliOptions, ({name}) => (opts[name] = true));
   }
 
@@ -65,14 +64,13 @@ export const handler = catchAsyncError(async opts => {
 
   const depsGroupsToCheck = _.filter(depsCliOptions, ({name}) => !!opts[name]);
   const depsGroupsToCheckStr = (depsGroupsToCheck.length === depsCliOptions.length) ?
-    '' : `${_.map(depsGroupsToCheck, 'name').join(' and ')} `;
+    '' : `${_.map(depsGroupsToCheck, ({name}) => strong(name)).join(' and ')} `;
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
 
   console.log(
     `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}for "${strong(packageFile)}"...`
   );
 
-  await ncu.initialize();
   const currentVersions = ncu.getCurrentDependencies(packageJson, {
     prod: opts.production,
     dev: opts.development,
@@ -81,7 +79,6 @@ export const handler = catchAsyncError(async opts => {
 
   const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest'});
   let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
-  npmProgress.disable();
 
   // Filtering modules that have to be updated
   upgradedVersions = _.pickBy(
@@ -124,7 +121,7 @@ export const handler = catchAsyncError(async opts => {
   if (!_.isEmpty(ignoredModules)) {
     const rows = _.map(ignoredModules, ({name, from, to}) => [
       strong(name),
-      from, '→', colorizeDiff(to, from),
+      from, '→', colorizeDiff(from, to),
       attention(config.ignore[name].versions),
       config.ignore[name].reason
     ]);
@@ -151,7 +148,7 @@ export const handler = catchAsyncError(async opts => {
     const answer = await askUser({
       type: 'list',
       message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" in package.json ` +
-      `from ${from} to ${colorizeDiff(to, from)}?`,
+      `from ${from} to ${colorizeDiff(from, to)}?`,
       choices: _.compact([
         {name: 'Yes', value: true},
         {name: 'No', value: false},

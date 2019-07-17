@@ -1,8 +1,9 @@
 import {resolve} from 'path';
 import {readFileSync} from 'fs';
+import libnpmconfig from 'libnpmconfig';
+import pacote from 'pacote';
 
 import _ from 'lodash';
-import npm from 'npm';
 
 export const DEPS_GROUPS = [
   {name: 'production', field: 'dependencies', cliOption: true},
@@ -10,6 +11,23 @@ export const DEPS_GROUPS = [
   {name: 'development', field: 'devDependencies', cliOption: true},
   {name: 'peer', field: 'peerDependencies', cliOption: false}
 ];
+
+const getNpmConfig = _.memoize(() => {
+  const config = {};
+
+  libnpmconfig.read().forEach((value, key) => {
+    if (typeof value === 'string') {
+      // Replacing env ${VARS} in strings with the `process.env` values
+      config[key] = value.replace(/\$\{(.+?)\}/gu, (_, envVar) =>
+        process.env[envVar]
+      );
+    } else {
+      config[key] = value;
+    }
+  });
+
+  return config;
+});
 
 export function loadPackageJson() {
   const packageFile = resolve('./package.json');
@@ -61,18 +79,8 @@ export function getModuleHomepage(packageJson) {
 }
 
 export const getModuleInfo = _.memoize(async moduleName =>
-  await new Promise((resolve, reject) => {
-    try {
-      npm.load({silent: true}, err => {
-        if (err) reject(err);
-        npm.commands.view([moduleName], true, (err, moduleInfo) => {
-          if (err) reject(err);
-          // `moduleInfo` contains object `{ <version>: <info> }`, so we should extract info from there
-          resolve(_.values(moduleInfo)[0]);
-        });
-      });
-    } catch (err) {
-      reject(err);
-    }
+  pacote.manifest(moduleName, {
+    ...getNpmConfig(),
+    'full-metadata': true
   })
 );
