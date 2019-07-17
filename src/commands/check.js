@@ -1,6 +1,7 @@
 import {writeFileSync} from 'fs';
 
 import _ from 'lodash';
+import {flow, map, partition} from 'lodash/fp';
 import opener from 'opener';
 import semver from 'semver';
 import detectIndent from 'detect-indent';
@@ -95,17 +96,17 @@ export const handler = catchAsyncError(async opts => {
   config.ignore = config.ignore || {};
 
   // Making arrays of outdated modules
-  const [ignoredModules, modulesToUpdate] = _(upgradedVersions)
-    .map((newVersion, moduleName) => ({
+  const [ignoredModules, modulesToUpdate] = flow(
+    map.convert({'cap': false})((newVersion, moduleName) => ({
       name: moduleName,
       from: currentVersions[moduleName],
       to: newVersion
-    }))
-    .partition(module => (
+    })),
+    partition(module => (
       _.has(config.ignore, module.name) &&
       semver.satisfies(latestVersions[module.name], config.ignore[module.name].versions)
     ))
-    .valueOf();
+  )(upgradedVersions);
 
   // Creating pretty-printed CLI tables with update info
   if (_.isEmpty(modulesToUpdate)) {

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {flow, split, compact, partition} from 'lodash/fp';
 
 export function globToRegexp(glob, flags) {
   const regexp = glob
@@ -10,21 +11,21 @@ export function globToRegexp(glob, flags) {
 }
 
 export function makeFilterFunction(filterStr = '') {
-  let [excludeFilters, includeFilters] = _(filterStr)
-    .split(/\s+/u)
-    .compact()
-    .partition(filter => filter[0] === '!')
-    .valueOf();
+  let [excludeFilters, includeFilters] = flow(
+    split(/\s+/u),
+    compact,
+    partition(filter => filter[0] === '!')
+  )(filterStr);
 
   if (!includeFilters.length) {
     includeFilters.push('*');
   }
 
-  includeFilters = _(includeFilters)
+  includeFilters = includeFilters
     .map(filter => globToRegexp(filter, 'i'))
     .map(filterRegexp => str => filterRegexp.test(str));
 
-  excludeFilters = _(excludeFilters)
+  excludeFilters = excludeFilters
     .map(filter => globToRegexp(filter.slice(1), 'i'))
     .map(filterRegexp => str => filterRegexp.test(str));
 
