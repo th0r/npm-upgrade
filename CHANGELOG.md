@@ -10,6 +10,16 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 2.0.0
+ * **Breaking Change**
+   * Drop support for Node.js <= 8.10
+   
+ * **Improvement**
+   * Show `@types/*` packages right below their corresponding modules (closes #32)
+ 
+ * **Internal**
+   * Update deps
+
 ## 1.4.1
  * **Improvement**
    * Preserve indentation in `package.json` (#21, @cascornelissen)
