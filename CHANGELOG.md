@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 2.0.1  
+ * **Improvement**
+   * Use indentation from `package.json` for `.npm-upgrade.json` ([#36](https://github.com/th0r/npm-upgrade/pull/36), [@cascornelissen](https://github.com/cascornelissen))
+
 ## 2.0.0
  * **Breaking Change**
    * Drop support for Node.js <= 8.10
