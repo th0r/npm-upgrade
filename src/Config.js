@@ -1,8 +1,9 @@
 import {resolve} from 'path';
 import {writeFileSync} from 'fs';
 import del from 'del';
-
 import _ from 'lodash';
+import detectIndent from 'detect-indent';
+import {loadPackageJson} from './packageUtils';
 
 const PROJECT_CONFIG_FILENAME = '.npm-upgrade.json';
 
@@ -32,9 +33,12 @@ export default class Config {
       if (_.isEmpty(data)) {
         this.remove();
       } else {
+        const {source: packageSource} = loadPackageJson();
+        const {indent} = detectIndent(packageSource);
+
         writeFileSync(
           this[path],
-          JSON.stringify(data, null, 2)
+          JSON.stringify(data, null, indent)
         );
       }
     } catch (err) {
