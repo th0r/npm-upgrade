@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 2.0.2  
+ * **Bug Fix**
+   * Fix handling of dependency group flags (`--production`, `--development` etc.)
+
 ## 2.0.1  
  * **Improvement**
    * Use indentation from `package.json` for `.npm-upgrade.json` ([#36](https://github.com/th0r/npm-upgrade/pull/36), [@cascornelissen](https://github.com/cascornelissen))
