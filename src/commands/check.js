@@ -15,6 +15,7 @@ import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention} from '../cliStyles';
 import askUser from '../askUser';
+import {toSentence} from '../stringUtils';
 import {askIgnoreFields} from './ignore';
 import Config from '../Config';
 
@@ -33,14 +34,12 @@ export const command = 'check [filter]';
 export const aliases = '*';
 export const describe = 'Check for outdated modules';
 
-const depsCliOptions = DEPS_GROUPS.filter(group => group.cliOption);
-
 export function builder(yargs) {
-  depsCliOptions
-    .forEach(({name, field}) =>
+  DEPS_GROUPS
+    .forEach(({name, field, flag}) =>
       yargs.option(name, {
         type: 'boolean',
-        alias: name[0],
+        alias: flag,
         describe: `check only "${field}"`
       })
     );
@@ -53,8 +52,8 @@ export const handler = catchAsyncError(async opts => {
   const filterModuleName = makeFilterFunction(filter);
 
   // Checking all the deps if all of them are omitted
-  if (_.every(depsCliOptions, ({name}) => !opts[name])) {
-    _.each(depsCliOptions, ({name}) => (opts[name] = true));
+  if (_.every(DEPS_GROUPS, ({name}) => !opts[name])) {
+    _.each(DEPS_GROUPS, ({name}) => (opts[name] = true));
   }
 
   // Loading `package.json` from the current directory
@@ -63,21 +62,20 @@ export const handler = catchAsyncError(async opts => {
   // Fetching remote changelogs db in background
   fetchRemoteDb();
 
-  const depsGroupsToCheck = _.filter(depsCliOptions, ({name}) => !!opts[name]);
-  const depsGroupsToCheckStr = (depsGroupsToCheck.length === depsCliOptions.length) ?
-    '' : `${_.map(depsGroupsToCheck, ({name}) => strong(name)).join(' and ')} `;
+  const depsGroupsToCheck = _.filter(DEPS_GROUPS, ({name}) => !!opts[name]);
+  const depsGroupsToCheckStr = (depsGroupsToCheck.length === DEPS_GROUPS.length) ?
+    '' : `${toSentence(_.map(depsGroupsToCheck, ({name}) => strong(name)))} `;
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
 
   console.log(
     `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}for "${strong(packageFile)}"...`
   );
 
-  const currentVersions = ncu.getCurrentDependencies(packageJson, {
-    prod: opts.production,
-    dev: opts.development,
-    optional: opts.optional
-  });
-
+  const ncuDepGroups = DEPS_GROUPS
+    .filter(({name}) => opts[name])
+    .map(({ncuValue}) => ncuValue)
+    .join(',');
+  const currentVersions = ncu.getCurrentDependencies(packageJson, {dep: ncuDepGroups});
   const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest'});
   let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
 

@@ -6,10 +6,11 @@ import pacote from 'pacote';
 import _ from 'lodash';
 
 export const DEPS_GROUPS = [
-  {name: 'production', field: 'dependencies', cliOption: true},
-  {name: 'optional', field: 'optionalDependencies', cliOption: true},
-  {name: 'development', field: 'devDependencies', cliOption: true},
-  {name: 'peer', field: 'peerDependencies', cliOption: false}
+  {name: 'production', field: 'dependencies', flag: 'p', ncuValue: 'prod'},
+  {name: 'optional', field: 'optionalDependencies', flag: 'o', ncuValue: 'optional'},
+  {name: 'development', field: 'devDependencies', flag: 'd', ncuValue: 'dev'},
+  {name: 'peer', field: 'peerDependencies', flag: 'r', ncuValue: 'peer'},
+  {name: 'bundled', field: 'bundledDependencies', altField: 'bundleDependencies', flag: 'b', ncuValue: 'bundle'}
 ];
 
 const getNpmConfig = _.memoize(() => {
@@ -46,8 +47,12 @@ export function loadPackageJson() {
 }
 
 export function findModuleDepsGroup(moduleName, packageJson) {
-  for (const group of _.map(DEPS_GROUPS, 'field')) {
-    const modules = packageJson[group];
+  for (const {field, altField} of DEPS_GROUPS) {
+    let modules = packageJson[field];
+
+    if (!modules && altField) {
+      modules = packageJson[altField];
+    }
 
     if (modules && modules[moduleName]) {
       return modules;
