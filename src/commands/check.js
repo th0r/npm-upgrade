@@ -241,7 +241,7 @@ export const handler = catchAsyncError(async opts => {
         // Assume yarn for now
         execSync('yarn',{stdio: 'inherit'})
         execSync('git add package.json yarn.lock',{stdio: 'inherit'})
-        execSync(`git commit -m "Upgraded ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
+        execSync(`git commit -m "Upgrade ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
         break;
 
       case true:
