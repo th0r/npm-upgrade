@@ -154,8 +154,8 @@ export const handler = catchAsyncError(async opts => {
       message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" in package.json ` +
       `from ${from} to ${colorizeDiff(from, to)}?`,
       choices: _.compact([
-        {name: 'Yes and create a separate commit', value: 'commit'},
         {name: 'Yes', value: true},
+        {name: 'Yes and create a separate commit', value: 'commit'},
         {name: 'No', value: false},
         // Don't show this option if we couldn't find module's changelog url
         (changelogUrl !== null) &&
