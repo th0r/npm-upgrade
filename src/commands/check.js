@@ -242,7 +242,7 @@ export const handler = catchAsyncError(async opts => {
 
         // execSync('npm i',{stdio: 'inherit'})
         execSync('git add package.json',{stdio: 'inherit'})
-        execSync(`git commit -m "Upgraded ${outdatedModule}"`,{stdio: 'inherit'})
+        execSync(`git commit -m "Upgraded ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
         break;
 
       case true:
