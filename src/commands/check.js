@@ -238,10 +238,9 @@ export const handler = catchAsyncError(async opts => {
           // Adding newline to the end of file
           `${JSON.stringify(packageJson, null, indent)}\n`
         );
-        console.log('NOW WE SHOULD COMMIT!');
-
-        // execSync('npm i',{stdio: 'inherit'})
-        execSync('git add package.json',{stdio: 'inherit'})
+        // Assume yarn for now
+        execSync('yarn',{stdio: 'inherit'})
+        execSync('git add package.json yarn.lock',{stdio: 'inherit'})
         execSync(`git commit -m "Upgraded ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
         break;
 
