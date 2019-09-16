@@ -18,6 +18,7 @@ import askUser from '../askUser';
 import {toSentence} from '../stringUtils';
 import {askIgnoreFields} from './ignore';
 import Config from '../Config';
+import { execSync } from 'child_process';
 
 const pkg = require('../../package.json');
 
@@ -154,6 +155,7 @@ export const handler = catchAsyncError(async opts => {
       `from ${from} to ${colorizeDiff(from, to)}?`,
       choices: _.compact([
         {name: 'Yes', value: true},
+        {name: 'Yes and create a separate commit', value: 'commit'},
         {name: 'No', value: false},
         // Don't show this option if we couldn't find module's changelog url
         (changelogUrl !== null) &&
@@ -216,6 +218,31 @@ export const handler = catchAsyncError(async opts => {
 
       case 'finish':
         isUpdateFinished = true;
+        break;
+
+      case 'commit':
+        updatedModules.push(outdatedModule);
+        setModuleVersion(name, to, packageJson);
+        delete config.ignore[name];
+
+        // Showing the list of modules that are going to be updated
+        console.log(
+          `\n${strong('These packages will be updated:')}\n\n` +
+          createUpdatedModulesTable(updatedModules) +
+          '\n'
+        );
+
+        const {indent} = detectIndent(packageSource);
+        writeFileSync(
+          packageFile,
+          // Adding newline to the end of file
+          `${JSON.stringify(packageJson, null, indent)}\n`
+        );
+        console.log('NOW WE SHOULD COMMIT!');
+
+        // execSync('npm i',{stdio: 'inherit'})
+        execSync('git add package.json',{stdio: 'inherit'})
+        execSync(`git commit -m "Upgraded ${outdatedModule}"`,{stdio: 'inherit'})
         break;
 
       case true:
