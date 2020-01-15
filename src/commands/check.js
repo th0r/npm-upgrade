@@ -155,7 +155,7 @@ export const handler = catchAsyncError(async opts => {
       `from ${from} to ${colorizeDiff(from, to)}?`,
       choices: _.compact([
         {name: 'Yes', value: true},
-        {name: 'Yes and create a separate commit', value: 'commit'},
+        {name: 'Update immediately and create a separate commit', value: 'commit'},
         {name: 'No', value: false},
         // Don't show this option if we couldn't find module's changelog url
         (changelogUrl !== null) &&
@@ -242,18 +242,18 @@ export const handler = catchAsyncError(async opts => {
         try {
           if (existsSync('yarn.lock')) {
             // Assume the user wants to use yarn
-            execSync('yarn', {stdio: 'inherit'})
-            execSync('git add package.json yarn.lock', {stdio: 'inherit'})
+            execSync('yarn', {stdio: 'inherit'});
+            execSync('git add package.json yarn.lock', {stdio: 'inherit'});
           } else if (existsSync('package-lock.json')) {
             // Use npm and package-lock.json
-            execSync('npm install', {stdio: 'inherit'})
-            execSync('git add package.json package-lock.json', {stdio: 'inherit'})
+            execSync('npm install', {stdio: 'inherit'});
+            execSync('git add package.json package-lock.json', {stdio: 'inherit'});
           } else {
             // Default to only using npm install and not including a lock file
-            execSync('npm install', {stdio: 'inherit'})
-            execSync('git add package.json', {stdio: 'inherit'})
+            execSync('npm install', {stdio: 'inherit'});
+            execSync('git add package.json', {stdio: 'inherit'});
           }
-          execSync(`git commit -m "Upgrade ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
+          execSync(`git commit -m "Upgrade ${name} from ${from} to ${to}"`,{stdio: 'inherit'});
           // Clean the list of packages to be updated after updating and commiting 
           updatedModules.splice(0, updatedModules.length);
         } catch(err) {
