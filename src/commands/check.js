@@ -1,4 +1,4 @@
-import {writeFileSync} from 'fs';
+import {writeFileSync, existsSync} from 'fs';
 
 import _ from 'lodash';
 import {flow, map, partition} from 'lodash/fp';
@@ -238,10 +238,25 @@ export const handler = catchAsyncError(async opts => {
           // Adding newline to the end of file
           `${JSON.stringify(packageJson, null, indent)}\n`
         );
-        // Assume yarn for now
-        execSync('yarn',{stdio: 'inherit'})
-        execSync('git add package.json yarn.lock',{stdio: 'inherit'})
-        execSync(`git commit -m "Upgrade ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
+
+        try {
+          if (existsSync('yarn.lock')) {
+            // Assume the user wants to use yarn
+            execSync('yarn', {stdio: 'inherit'})
+            execSync('git add package.json yarn.lock', {stdio: 'inherit'})
+          } else if (existsSync('package-lock.json')) {
+            // Use npm and package-lock.json
+            execSync('npm install', {stdio: 'inherit'})
+            execSync('git add package.json package-lock.json', {stdio: 'inherit'})
+          } else {
+            // Default to only using npm install and not including a lock file
+            execSync('npm install', {stdio: 'inherit'})
+            execSync('git add package.json', {stdio: 'inherit'})
+          }
+          execSync(`git commit -m "Upgrade ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
+        } catch(err) {
+          console.error(err)
+        }
         break;
 
       case true:
