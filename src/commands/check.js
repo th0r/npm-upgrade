@@ -254,6 +254,8 @@ export const handler = catchAsyncError(async opts => {
             execSync('git add package.json', {stdio: 'inherit'})
           }
           execSync(`git commit -m "Upgrade ${name} from ${from} to ${to}"`,{stdio: 'inherit'})
+          // Clean the list of packages to be updated after updating and commiting 
+          updatedModules.splice(0, updatedModules.length);
         } catch(err) {
           console.error(err)
         }
