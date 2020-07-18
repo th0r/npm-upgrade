@@ -2,7 +2,7 @@ import {writeFileSync} from 'fs';
 
 import _ from 'lodash';
 import {flow, map, partition} from 'lodash/fp';
-import opener from 'opener';
+import open from 'open';
 import semver from 'semver';
 import detectIndent from 'detect-indent';
 import ncu from 'npm-check-updates';
@@ -181,7 +181,7 @@ export const handler = catchAsyncError(async opts => {
 
         if (changelogUrl) {
           console.log(`Opening ${strong(changelogUrl)}...`);
-          opener(changelogUrl);
+          open(changelogUrl);
         } else {
           console.log(
             `Sorry, we haven't found any changelog URL for ${strong(name)} module.\n` +
@@ -202,7 +202,7 @@ export const handler = catchAsyncError(async opts => {
 
         if (homepage) {
           console.log(`Opening ${strong(homepage)}...`);
-          opener(homepage);
+          open(homepage);
         } else {
           console.log(`Sorry, there is no info about homepage URL in the ${strong(name)}'s package.json`);
         }

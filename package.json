@@ -37,7 +37,7 @@
     "libnpmconfig": "1.2.1",
     "lodash": "4.17.14",
     "npm-check-updates": "4.0.3",
-    "opener": "1.5.1",
+    "open": "^7.0.4",
     "pacote": "9.5.4",
     "semver": "6.2.0",
     "yargs": "13.3.0"
