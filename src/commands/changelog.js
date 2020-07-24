@@ -1,4 +1,4 @@
-import opener from 'opener';
+import open from 'open';
 
 import catchAsyncError from '../catchAsyncError';
 import {findModuleChangelogUrl} from '../changelogUtils';
@@ -24,7 +24,7 @@ export const handler = catchAsyncError(async opts => {
 
   if (changelogUrl) {
     console.log(`Opening ${strong(changelogUrl)}...`);
-    opener(changelogUrl);
+    open(changelogUrl);
   } else {
     console.log(
       "Sorry, we haven't found any changelog URL for this module.\n" +
