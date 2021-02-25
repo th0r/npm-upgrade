@@ -86,6 +86,6 @@ export function getModuleHomepage(packageJson) {
 export const getModuleInfo = _.memoize(async moduleName =>
   pacote.manifest(moduleName, {
     ...getNpmConfig(),
-    'full-metadata': true
+    fullMetadata: true
   })
 );
