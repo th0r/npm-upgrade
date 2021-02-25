@@ -10,6 +10,13 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 3.0.0
+ * **Breaking Change**
+   * Drop support for Node.js <= 10.19
+
+ * **Internal**
+   * Update deps
+
 ## 2.0.4
  * **Internal**
    * Use `open` package instead of `opener` ([#52](https://github.com/th0r/npm-upgrade/pull/52), [@cascornelissen](https://github.com/cascornelissen))
