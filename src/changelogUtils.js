@@ -7,7 +7,7 @@ import {getRepositoryInfo} from './repositoryUtils';
 
 const pkg = require('../package.json');
 
-const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'CHANGES.md', 'CHANGELOG'];
+const COMMON_CHANGELOG_FILES = ['CHANGELOG.md', 'History.md', 'HISTORY.md', 'CHANGES.md', 'CHANGELOG'];
 const CURRENT_REPOSITORY_ID = getRepositoryInfo(pkg.repository.url).repositoryId;
 const DEFAULT_REMOTE_CHANGELOGS_DB_URL =
   `https://raw.githubusercontent.com/${CURRENT_REPOSITORY_ID}/master/db/changelogUrls.json`;
