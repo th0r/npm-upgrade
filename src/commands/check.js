@@ -75,17 +75,24 @@ export const handler = catchAsyncError(async opts => {
     .filter(({name}) => opts[name])
     .map(({ncuValue}) => ncuValue)
     .join(',');
+
   const currentVersions = ncu.getCurrentDependencies(packageJson, {dep: ncuDepGroups});
-  const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest'});
-  let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
+  const peerDependencies = ncu.getPeerDependencies(currentVersions, {});
+  const [upgradedVersionsFull, compatibleVersions, upgradedPeerDependencies] =
+    await ncu.upgradePackageDefinitions(
+      currentVersions,
+      {versionTarget: 'latest', peer: true, peerDependencies}
+    );
+  const incompatibleUpgrades =
+    await ncu.getIgnoredUpgrades(currentVersions, upgradedVersionsFull, upgradedPeerDependencies);
 
   // Filtering modules that have to be updated
-  upgradedVersions = _.pickBy(
-    upgradedVersions,
+  const upgradedVersions = _.pickBy(
+    upgradedVersionsFull,
     (newVersion, moduleName) => filterModuleName(moduleName)
   );
 
-  if (_.isEmpty(upgradedVersions)) {
+  if (_.isEmpty(upgradedVersions) && _.isEmpty(incompatibleUpgrades)) {
     return console.log(success('All dependencies are up-to-date!'));
   }
 
@@ -98,11 +105,12 @@ export const handler = catchAsyncError(async opts => {
     map.convert({'cap': false})((newVersion, moduleName) => ({
       name: moduleName,
       from: currentVersions[moduleName],
-      to: newVersion
+      to: newVersion,
+      toVersion: compatibleVersions[moduleName]
     })),
     partition(module => (
       _.has(config.ignore, module.name) &&
-      semver.satisfies(latestVersions[module.name], config.ignore[module.name].versions)
+      semver.satisfies(module.toVersion, config.ignore[module.name].versions)
     ))
   )(upgradedVersions);
 
@@ -119,6 +127,19 @@ export const handler = catchAsyncError(async opts => {
     console.log(
       `\n${strong('New versions of active modules available:')}\n\n${createUpdatedModulesTable(modulesToUpdate)}`
     );
+  }
+
+  if (!_.isEmpty(incompatibleUpgrades)) {
+    const rows = _.map(Object.entries(incompatibleUpgrades), ([name, {from, to, reason}]) => [
+      strong(name),
+      from, '→', colorizeDiff(from, to),
+      'reason: ' + Object.entries(reason)
+        .map(([pkgReason, requirement]) => pkgReason + ' requires ' + requirement)
+        .join(', ')
+    ]);
+
+    console.log(`\n${strong('Ignored incompatible updates (peer dependencies):')}`);
+    console.log(`\n${createSimpleTable(rows, {colAligns: 'lrrrl'})}`);
   }
 
   if (!_.isEmpty(ignoredModules)) {
@@ -142,7 +163,7 @@ export const handler = catchAsyncError(async opts => {
   let isUpdateFinished = false;
   while (modulesToUpdate.length && !isUpdateFinished) {
     const outdatedModule = modulesToUpdate.shift();
-    const {name, from, to} = outdatedModule;
+    const {name, from, to, toVersion} = outdatedModule;
     let {changelogUrl, homepage} = outdatedModule;
 
     // Adds new line
@@ -209,7 +230,7 @@ export const handler = catchAsyncError(async opts => {
         break;
 
       case 'ignore': {
-        const {versions, reason} = await askIgnoreFields(latestVersions[name]);
+        const {versions, reason} = await askIgnoreFields(toVersion);
         config.ignore[name] = {versions, reason};
         break;
       }
