@@ -92,8 +92,6 @@ export const handler = catchAsyncError(async opts => {
 
   // Get the full version list for packages that need updating
   const allVersions = await getAllPackageVersions(Object.keys(upgradedVersions), currentVersions);
-  // console.log(JSON.stringify(currentVersions, null, 2));
-
 
   // Getting the list of ignored modules
   const config = new Config();
@@ -313,7 +311,6 @@ function sortModules(modules) {
 async function getAllPackageVersions(packageList, currentVersions = {}) {
   // Get the full version list for packages that need updating
   const packageManager = ncu.getPackageManager();
-  // console.log('>>>', typeof packageManager.viewOne);
 
   const allVersions = {};
   for (const name of packageList) {
@@ -330,7 +327,6 @@ async function getAllPackageVersions(packageList, currentVersions = {}) {
 async function askSpecificVersion(name, allVersions, currentVersions) {
   let prefix = '';
   let current = currentVersions[name] || '';
-  console.log({current, t: typeof current});
 
   if (current && (/^[^~>]/.test(current))) {
     // starts with ^, ~, or >
