@@ -6,11 +6,12 @@ import open from 'open';
 import semver from 'semver';
 import detectIndent from 'detect-indent';
 import ncu from 'npm-check-updates';
+import shell from 'shelljs';
 import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
-import {DEPS_GROUPS, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
+import {DEPS_GROUPS, createGlobalPackageJson, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention} from '../cliStyles';
@@ -54,10 +55,12 @@ export const handler = catchAsyncError(async opts => {
   // Checking all the deps if all of them are omitted
   if (_.every(DEPS_GROUPS, ({name}) => !opts[name])) {
     _.each(DEPS_GROUPS, ({name}) => (opts[name] = true));
+    opts.global = false;
   }
 
   // Loading `package.json` from the current directory
-  const {path: packageFile, content: packageJson, source: packageSource} = loadPackageJson();
+  const {path: packageFile, content: packageJson, source: packageSource} = opts.global ?
+    createGlobalPackageJson() : loadPackageJson();
 
   // Fetching remote changelogs db in background
   fetchRemoteDb();
@@ -68,7 +71,7 @@ export const handler = catchAsyncError(async opts => {
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
 
   console.log(
-    `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}for "${strong(packageFile)}"...`
+    `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}${opts.global ? '' : (`for "${strong(packageFile)}"`)}...`
   );
 
   const ncuDepGroups = DEPS_GROUPS
@@ -150,8 +153,7 @@ export const handler = catchAsyncError(async opts => {
 
     const answer = await askUser({
       type: 'list',
-      message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" in package.json ` +
-      `from ${from} to ${colorizeDiff(from, to)}?`,
+      message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" ${opts.global ? 'globally' : 'in package.json'} from ${from} to ${colorizeDiff(from, to)}?`,
       choices: _.compact([
         {name: 'Yes', value: true},
         {name: 'No', value: false},
@@ -243,6 +245,19 @@ export const handler = catchAsyncError(async opts => {
     createUpdatedModulesTable(updatedModules) +
     '\n'
   );
+
+  if (opts.global)
+  {
+    const shouldUpdateGlobalPackages = await askUser(
+      {type: 'confirm', message: 'Update global modules?', default: true}
+    );
+
+    if (!shouldUpdateGlobalPackages)
+      return;
+
+    console.log(`Automatically upgrading ${updatedModules.length} modules...`);
+    return shell.exec(`npm install --global ${updatedModules.map(({name, to}) => `${name}@${to}`).join(' ')}`);
+  }
 
   const shouldUpdatePackageFile = await askUser(
     {type: 'confirm', message: 'Update package.json?', default: true}

@@ -1,11 +1,13 @@
 import {resolve} from 'path';
-import {readFileSync} from 'fs';
+import {readFileSync, readdirSync} from 'fs';
 import libnpmconfig from 'libnpmconfig';
 import pacote from 'pacote';
+import shell from 'shelljs';
 
 import _ from 'lodash';
 
 export const DEPS_GROUPS = [
+  {name: 'global', field: 'dependencies', flag: 'g', ncuValue: 'prod'},
   {name: 'production', field: 'dependencies', flag: 'p', ncuValue: 'prod'},
   {name: 'optional', field: 'optionalDependencies', flag: 'o', ncuValue: 'optional'},
   {name: 'development', field: 'devDependencies', flag: 'd', ncuValue: 'dev'},
@@ -29,6 +31,32 @@ const getNpmConfig = _.memoize(() => {
 
   return config;
 });
+
+export function createGlobalPackageJson() {
+  // const globalPath = resolve(process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + '/.local/share'), 'npm', 'node_modules');
+  const globalPath = shell.exec('npm root -g', {silent: true}).stdout?.replace('\n', '');
+  const pkg = { dependencies: {} };
+
+  try {
+    const modules = readdirSync(globalPath);
+    for (const dir of modules)
+    {
+      try {
+        const packageSource = readFileSync(resolve(globalPath, dir, 'package.json'), 'utf-8');
+        const packageJson = JSON.parse(packageSource);
+        if (packageJson.name && packageJson.version)
+          pkg.dependencies[packageJson.name] = packageJson.version;
+      } catch (err) {
+        // package.json doesn't exist for this global module
+        // or package.json couldn't be parsed
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return {content: pkg};
+}
 
 export function loadPackageJson() {
   const packageFile = resolve('./package.json');
