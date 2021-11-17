@@ -33,8 +33,12 @@ const getNpmConfig = _.memoize(() => {
 });
 
 export function createGlobalPackageJson() {
-  // const globalPath = resolve(process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + '/.local/share'), 'npm', 'node_modules');
-  const globalPath = shell.exec('npm root -g', {silent: true}).stdout?.replace('\n', '');
+  // retrieve the global package install path
+  const res = shell.exec('npm root -g', {silent: true});
+  if (res.code !== 0)
+    throw new Error(`Could not determine npm's root path: ${res.stderr}`);
+
+  const globalPath = res.stdout?.replace('\n', '');
   const pkg = { dependencies: {} };
 
   try {
