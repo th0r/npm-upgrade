@@ -72,6 +72,8 @@ If you want to check only a group of deps use these options:
 -o, --optional     Check only "optionalDependencies"
 ```
 
+Alternatively, you can use the `-g` (`--global`) flag to upgrade your global packages. **Note** that this flag is mutually exclusive and `npm-upgrade` will only recognise the global flag if supplied with others. Also **Note** that this option will automatically attempt to upgrade your global packages using `npm install <package>@<new-version>`.
+
 #### Ignoring module
 Sometimes you just want to ignore newer versions of some dependency for some reason. For example, you use `jquery v2` because of the old IE support and don't want `npm-upgrade` to suggest you updating it to `v3`. Or you use `some-funky-module@6.6.5` and know that the new version `6.6.6` contains a bug that breaks your app.
 
