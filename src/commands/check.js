@@ -58,6 +58,13 @@ export const handler = catchAsyncError(async opts => {
     opts.global = false;
   }
 
+  // Make global flag mutually exclusive with other flags
+  else if (opts.global) {
+    for (let i = 0; i < DEPS_GROUPS.length; i++)
+      opts[DEPS_GROUPS[i].name] = false;
+    opts.global = true;
+  }
+
   // Loading `package.json` from the current directory
   const {path: packageFile, content: packageJson, source: packageSource} = opts.global ?
     createGlobalPackageJson() : loadPackageJson();
