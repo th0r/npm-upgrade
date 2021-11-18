@@ -262,7 +262,7 @@ export const handler = catchAsyncError(async opts => {
     if (!shouldUpdateGlobalPackages)
       return;
 
-    console.log(`Automatically upgrading ${updatedModules.length} modules...`);
+    console.log(`Automatically upgrading ${updatedModules.length} module${updatedModules.length !== 1 ? 's' : ''}...`);
     return shell.exec(`npm install --global ${updatedModules.map(({name, to}) => `${name}@${to}`).join(' ')}`);
   }
 
