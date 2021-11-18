@@ -41,19 +41,36 @@ export function createGlobalPackageJson() {
   const globalPath = res.stdout?.replace('\n', '');
   const pkg = { dependencies: {} };
 
+  function getPackageVersion(path)
+  {
+    try {
+      const packageSource = readFileSync(path, 'utf-8');
+      const packageJson = JSON.parse(packageSource);
+      if (packageJson.name && packageJson.version)
+        pkg.dependencies[packageJson.name] = packageJson.version;
+    } catch (err) {
+      // package.json doesn't exist for this global module
+      // or package.json couldn't be parsed
+    }
+  }
+
   try {
     const modules = readdirSync(globalPath);
     for (const dir of modules)
     {
-      try {
-        const packageSource = readFileSync(resolve(globalPath, dir, 'package.json'), 'utf-8');
-        const packageJson = JSON.parse(packageSource);
-        if (packageJson.name && packageJson.version)
-          pkg.dependencies[packageJson.name] = packageJson.version;
-      } catch (err) {
-        // package.json doesn't exist for this global module
-        // or package.json couldn't be parsed
+      const dirPath = resolve(globalPath, dir);
+
+      if (dir.startsWith('@'))
+      {
+        const subModules = readdirSync(dirPath);
+        for (const subDir of subModules)
+        {
+          getPackageVersion(resolve(dirPath, subDir, 'package.json'));
+        }
       }
+
+      else
+        getPackageVersion(resolve(dirPath, 'package.json'));
     }
   } catch (err) {
     console.error(err);
