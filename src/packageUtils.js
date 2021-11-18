@@ -1,5 +1,5 @@
 import {resolve} from 'path';
-import {readFileSync, readdirSync} from 'fs';
+import {readFileSync, readdirSync, statSync} from 'fs';
 import libnpmconfig from 'libnpmconfig';
 import pacote from 'pacote';
 import shell from 'shelljs';
@@ -59,12 +59,17 @@ export function createGlobalPackageJson() {
     for (const dir of modules)
     {
       const dirPath = resolve(globalPath, dir);
+      if (!statSync(dirPath).isDirectory())
+        continue;
 
       if (dir.startsWith('@'))
       {
         const subModules = readdirSync(dirPath);
         for (const subDir of subModules)
         {
+          if (!statSync(resolve(dirPath, subDir)).isDirectory())
+            continue;
+
           getPackageVersion(resolve(dirPath, subDir, 'package.json'));
         }
       }
