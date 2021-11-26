@@ -34,17 +34,15 @@ const getNpmConfig = _.memoize(() => {
 
 export function loadGlobalPackages() {
   const res = shell.exec('npm ls -g --depth 0 --json', {silent: true});
-  if (res.code !== 0)
-    throw new Error(`Could not determine global packages: ${res.stderr}`);
+  if (res.code !== 0) {throw new Error(`Could not determine global packages: ${res.stderr}`)}
 
   try {
     const {dependencies} = JSON.parse(res);
     const content = {dependencies};
 
-    for (const [ pkg, {version} ] of Object.entries(dependencies))
-      content.dependencies[pkg] = version;
+    for (const [pkg, {version}] of Object.entries(dependencies)) {content.dependencies[pkg] = version}
 
-    return {content}
+    return {content};
   } catch (err) {
     console.error(`Error parsing global packages: ${err.message}`);
     process.exit(1);

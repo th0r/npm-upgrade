@@ -11,7 +11,8 @@ import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
-import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
+import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion,
+  getModuleInfo, getModuleHomepage} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention} from '../cliStyles';
@@ -56,12 +57,9 @@ export const handler = catchAsyncError(async opts => {
   if (_.every(DEPS_GROUPS, ({name}) => !opts[name])) {
     _.each(DEPS_GROUPS, ({name}) => (opts[name] = true));
     opts.global = false;
-  }
-
-  // Make global flag mutually exclusive with other flags
-  else if (opts.global) {
-    for (let i = 0; i < DEPS_GROUPS.length; i++)
-      _.each(DEPS_GROUPS, ({name}) => { opts[name] = false });
+  } else if (opts.global) {
+    // Make global flag mutually exclusive with other flags
+    for (let i = 0; i < DEPS_GROUPS.length; i++) {_.each(DEPS_GROUPS, ({name}) => { opts[name] = false })}
     opts.global = true;
   }
 
@@ -78,7 +76,8 @@ export const handler = catchAsyncError(async opts => {
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
 
   console.log(
-    `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}${opts.global ? '' : (`for "${strong(packageFile)}"`)}...`
+    `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}${opts.global ? '' :
+      (`for "${strong(packageFile)}"`)}...`
   );
 
   const ncuDepGroups = DEPS_GROUPS
@@ -160,7 +159,8 @@ export const handler = catchAsyncError(async opts => {
 
     const answer = await askUser({
       type: 'list',
-      message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" ${opts.global ? 'globally' : 'in package.json'} from ${from} to ${colorizeDiff(from, to)}?`,
+      message: `${changelogUrl === undefined ? 'U' : 'So, u'}pdate "${name}" ${opts.global ? 'globally' :
+        'in package.json'} from ${from} to ${colorizeDiff(from, to)}?`,
       choices: _.compact([
         {name: 'Yes', value: true},
         {name: 'No', value: false},
@@ -258,8 +258,7 @@ export const handler = catchAsyncError(async opts => {
       {type: 'confirm', message: 'Update global modules?', default: true}
     );
 
-    if (!shouldUpdateGlobalPackages)
-      return;
+    if (!shouldUpdateGlobalPackages) {return}
 
     console.log(`Automatically upgrading ${updatedModules.length} module${updatedModules.length !== 1 ? 's' : ''}...`);
     return shell.exec(`npm install --global ${updatedModules.map(({name, to}) => `${name}@${to}`).join(' ')}`);
