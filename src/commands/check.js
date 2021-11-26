@@ -253,8 +253,7 @@ export const handler = catchAsyncError(async opts => {
     '\n'
   );
 
-  if (opts.global)
-  {
+  if (opts.global) {
     const shouldUpdateGlobalPackages = await askUser(
       {type: 'confirm', message: 'Update global modules?', default: true}
     );
