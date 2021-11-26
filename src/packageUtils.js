@@ -1,5 +1,5 @@
 import {resolve} from 'path';
-import {readFileSync, readdirSync, statSync} from 'fs';
+import {readFileSync} from 'fs';
 import libnpmconfig from 'libnpmconfig';
 import pacote from 'pacote';
 import shell from 'shelljs';
@@ -32,56 +32,23 @@ const getNpmConfig = _.memoize(() => {
   return config;
 });
 
-export function createGlobalPackageJson() {
-  // retrieve the global package install path
-  const res = shell.exec('npm root -g', {silent: true});
+export function loadGlobalPackages() {
+  const res = shell.exec('npm ls -g --depth 0 --json', {silent: true});
   if (res.code !== 0)
-    throw new Error(`Could not determine npm's root path: ${res.stderr}`);
-
-  const globalPath = res.stdout?.replace('\n', '');
-  const pkg = { dependencies: {} };
-
-  function getPackageVersion(path)
-  {
-    try {
-      const packageSource = readFileSync(path, 'utf-8');
-      const packageJson = JSON.parse(packageSource);
-      if (packageJson.name && packageJson.version)
-        pkg.dependencies[packageJson.name] = packageJson.version;
-    } catch (err) {
-      // package.json doesn't exist for this global module
-      // or package.json couldn't be parsed
-    }
-  }
+    throw new Error(`Could not determine global packages: ${res.stderr}`);
 
   try {
-    const modules = readdirSync(globalPath);
-    for (const dir of modules)
-    {
-      const dirPath = resolve(globalPath, dir);
-      if (!statSync(dirPath).isDirectory())
-        continue;
+    const {dependencies} = JSON.parse(res);
+    const content = {dependencies};
 
-      if (dir.startsWith('@'))
-      {
-        const subModules = readdirSync(dirPath);
-        for (const subDir of subModules)
-        {
-          if (!statSync(resolve(dirPath, subDir)).isDirectory())
-            continue;
+    for (const [ pkg, {version} ] of Object.entries(dependencies))
+      content.dependencies[pkg] = version;
 
-          getPackageVersion(resolve(dirPath, subDir, 'package.json'));
-        }
-      }
-
-      else
-        getPackageVersion(resolve(dirPath, 'package.json'));
-    }
+    return {content}
   } catch (err) {
-    console.error(err);
+    console.error(`Error parsing global packages: ${err.message}`);
+    process.exit(1);
   }
-
-  return {content: pkg};
 }
 
 export function loadPackageJson() {

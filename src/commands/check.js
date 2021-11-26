@@ -11,7 +11,7 @@ import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
-import {DEPS_GROUPS, createGlobalPackageJson, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
+import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion, getModuleInfo, getModuleHomepage} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention} from '../cliStyles';
@@ -67,7 +67,7 @@ export const handler = catchAsyncError(async opts => {
 
   // Loading `package.json` from the current directory
   const {path: packageFile, content: packageJson, source: packageSource} = opts.global ?
-    createGlobalPackageJson() : loadPackageJson();
+    loadGlobalPackages() : loadPackageJson();
 
   // Fetching remote changelogs db in background
   fetchRemoteDb();
