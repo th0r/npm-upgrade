@@ -59,7 +59,7 @@ export const handler = catchAsyncError(async opts => {
     opts.global = false;
   } else if (opts.global) {
     // Make global flag mutually exclusive with other flags
-    for (let i = 0; i < DEPS_GROUPS.length; i++) {_.each(DEPS_GROUPS, ({name}) => { opts[name] = false })}
+    _.each(DEPS_GROUPS, ({name}) => { opts[name] = false });
     opts.global = true;
   }
 
