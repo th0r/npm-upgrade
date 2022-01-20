@@ -2,10 +2,12 @@ import {resolve} from 'path';
 import {readFileSync} from 'fs';
 import libnpmconfig from 'libnpmconfig';
 import pacote from 'pacote';
+import shell from 'shelljs';
 
 import _ from 'lodash';
 
 export const DEPS_GROUPS = [
+  {name: 'global', field: 'dependencies', flag: 'g', ncuValue: 'prod'},
   {name: 'production', field: 'dependencies', flag: 'p', ncuValue: 'prod'},
   {name: 'optional', field: 'optionalDependencies', flag: 'o', ncuValue: 'optional'},
   {name: 'development', field: 'devDependencies', flag: 'd', ncuValue: 'dev'},
@@ -29,6 +31,23 @@ const getNpmConfig = _.memoize(() => {
 
   return config;
 });
+
+export function loadGlobalPackages() {
+  const res = shell.exec('npm ls -g --depth 0 --json', {silent: true});
+  if (res.code !== 0) {throw new Error(`Could not determine global packages: ${res.stderr}`)}
+
+  try {
+    const {dependencies} = JSON.parse(res);
+    const content = {dependencies};
+
+    for (const [pkg, {version}] of Object.entries(dependencies)) {content.dependencies[pkg] = version}
+
+    return {content};
+  } catch (err) {
+    console.error(`Error parsing global packages: ${err.message}`);
+    process.exit(1);
+  }
+}
 
 export function loadPackageJson() {
   const packageFile = resolve('./package.json');
