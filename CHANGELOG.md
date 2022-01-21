@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## 3.1.0
+* **New Feature**
+  * `--global` flag that allows to upgrade global packages ([#70](https://github.com/th0r/npm-upgrade/pull/70), [@Medallyon](https://github.com/Medallyon))
+
 ## 3.0.0
  * **Breaking Change**
    * Drop support for Node.js <= 10.19
