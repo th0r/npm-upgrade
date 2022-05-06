@@ -36,5 +36,6 @@
     "bluebird": "http://bluebirdjs.com/docs/changelog.html",
     "browserify": "https://github.com/substack/node-browserify/blob/master/changelog.markdown",
     "fluxible": "https://github.com/yahoo/fluxible/blob/master/packages/fluxible/CHANGELOG.md",
-    "lodash": "https://github.com/lodash/lodash/wiki/Changelog"
+    "lodash": "https://github.com/lodash/lodash/wiki/Changelog",
+    "vue-loader": "https://github.com/vuejs/vue-loader/releases"
 }
