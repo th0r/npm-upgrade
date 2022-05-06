@@ -1,4 +1,5 @@
 {
+    "@babel/core": "https://github.com/babel/babel/blob/main/CHANGELOG.md",
     "@rollup/plugin-alias": "https://github.com/rollup/plugins/blob/master/packages/alias/CHANGELOG.md",
     "@rollup/plugin-auto-install": "https://github.com/rollup/plugins/blob/master/packages/auto-install/CHANGELOG.md",
     "@rollup/plugin-babel": "https://github.com/rollup/plugins/blob/master/packages/babel/CHANGELOG.md",
