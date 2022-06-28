@@ -12,10 +12,10 @@ import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
 import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion,
-  getModuleInfo, getModuleHomepage} from '../packageUtils';
+  getModuleInfo, getModuleHomepage, getVersionPublicationDate} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
-import {strong, success, attention} from '../cliStyles';
+import {strong, success, attention, upgradeCaution, upgradeWarning, upgradeInfo} from '../cliStyles';
 import askUser from '../askUser';
 import {toSentence} from '../stringUtils';
 import {askIgnoreFields} from './ignore';
@@ -156,6 +156,19 @@ export const handler = catchAsyncError(async opts => {
 
     // Adds new line
     console.log('');
+
+    // This checks if the package was released less than 3 days ago, throws a warning if true
+    let publishedDate = await getVersionPublicationDate(name, to);
+    publishedDate = new Date(publishedDate);
+    const recommendedDatePrior = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3)); // This is 3 days prior to execution time.
+    const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
+    if (isRecent) {
+      const timeSincePublication = new Date(Date.now()).getTime() - publishedDate.getTime();
+      const warningLevel = (isRecent && timeSincePublication < (1000 * 60 * 60 * 24 * 1)) ? 'caution' : (timeSincePublication < (1000 * 60 * 60 * 24 * 2)) ? 'warning' : 'info';
+      let message = (warningLevel === 'caution') ? upgradeCaution("CAUTION") : (warningLevel === 'warning') ? upgradeWarning("WARN") : upgradeInfo("INFO");
+      message += ` ${name}@${to} was released less than ${Math.ceil(timeSincePublication / (1000*60*60*24))} days ago, be careful when upgrading.`;
+      console.log(message);
+    }
 
     const answer = await askUser({
       type: 'list',
