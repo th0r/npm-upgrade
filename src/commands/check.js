@@ -166,7 +166,7 @@ export const handler = catchAsyncError(async opts => {
       const timeSincePublication = new Date(Date.now()).getTime() - publishedDate.getTime();
       const warningLevel = (isRecent && timeSincePublication < (1000 * 60 * 60 * 24 * 1)) ? 'caution' : (timeSincePublication < (1000 * 60 * 60 * 24 * 2)) ? 'warning' : 'info';
       let message = (warningLevel === 'caution') ? upgradeCaution("CAUTION") : (warningLevel === 'warning') ? upgradeWarning("WARN") : upgradeInfo("INFO");
-      message += ` ${name}@${to} was released less than ${Math.ceil(timeSincePublication / (1000*60*60*24))} days ago, be careful when upgrading.`;
+      message += ` ${name}@${to.replace("^", "")} was released less than ${Math.ceil(timeSincePublication / (1000*60*60*24))} days ago, be careful when upgrading.`;
       console.log(message);
     }
 
