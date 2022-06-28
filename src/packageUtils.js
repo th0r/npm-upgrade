@@ -4,7 +4,7 @@ import libnpmconfig from 'libnpmconfig';
 import pacote from 'pacote';
 import shell from 'shelljs';
 
-import _, { map } from 'lodash';
+import _ from 'lodash';
 import got from 'got';
 
 export const DEPS_GROUPS = [
