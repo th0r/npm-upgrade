@@ -33,6 +33,7 @@
     "@testing-library/react": "https://github.com/testing-library/react-testing-library/releases",
     "@testing-library/react-hooks": "https://github.com/testing-library/react-hooks-testing-library/releases",
     "@testing-library/user-event": "https://github.com/testing-library/user-event/releases",
+    "@zxing/ngx-scanner": "https://github.com/zxing-js/ngx-scanner/releases",
     "bluebird": "http://bluebirdjs.com/docs/changelog.html",
     "browserify": "https://github.com/substack/node-browserify/blob/master/changelog.markdown",
     "fluxible": "https://github.com/yahoo/fluxible/blob/master/packages/fluxible/CHANGELOG.md",
