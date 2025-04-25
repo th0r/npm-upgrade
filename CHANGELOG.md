@@ -10,7 +10,7 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
-## UNRELEASED
+## 3.1.1
 * **Improvement**
   * Disable timeout for fetching NPM repository (fixes [#74](https://github.com/th0r/npm-upgrade/issues/74))
   * Add GitLab to the list of known repositories so `npm-upgrade` now searches for common changelog files there (fixes [#47](https://github.com/th0r/npm-upgrade/issues/47))
