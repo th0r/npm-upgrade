@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## UNRELEASED
+* **Improvement**
+  * Disable timeout for fetching NPM repository (fixes [#74](https://github.com/th0r/npm-upgrade/issues/74))
+
 ## 3.1.0
 * **New Feature**
   * `--global` flag that allows to upgrade global packages ([#70](https://github.com/th0r/npm-upgrade/pull/70), [@Medallyon](https://github.com/Medallyon))

@@ -85,7 +85,7 @@ export const handler = catchAsyncError(async opts => {
     .map(({ncuValue}) => ncuValue)
     .join(',');
   const currentVersions = ncu.getCurrentDependencies(packageJson, {dep: ncuDepGroups});
-  const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest'});
+  const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest', timeout: 0});
   let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
 
   // Filtering modules that have to be updated
