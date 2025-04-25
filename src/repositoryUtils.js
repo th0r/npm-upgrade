@@ -9,7 +9,7 @@ const KNOWN_REPOSITORIES = {
 
     return {
       repositoryId,
-      fileUrlBuilder: filename => `${rootUrl}/blob/master/${filename}`,
+      fileUrlBuilder: filename => `${rootUrl}/blob/-/${filename}`,
       releasesPageUrl: `${rootUrl}/releases`
     };
   },
