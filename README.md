@@ -117,7 +117,7 @@ Yes, It can happen sometimes. This is because there is no standardized way to sp
 
 1. Check `db/changelogUrls.json` from `master` branch on GitHub or the local copy if it's unreachable.
 2. Check `changelog` field from module's `package.json`.
-3. Parse module's `repository.url` field and if it's on GitHub, try to request some common changelog files (`CHANGELOG.md`, `History.md` etc.) from `master` branch and if it fails, open `Releases` page.
+3. Parse module's `repository.url` field and if it's on GitHub or GitLab, try to request some common changelog files (`CHANGELOG.md`, `History.md` etc.) from main branch and if it fails, open `Releases` page.
 
 So, if it guessed wrong it would be great if you could either [fill an issue](../../issues/new) about this or submit a PR which adds proper changelog URL to `db/changelogUrls.json`. There is a tool in the repository for you to make it as easy as possible:
 ```sh
