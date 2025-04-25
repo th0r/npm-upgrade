@@ -12,6 +12,16 @@ const KNOWN_REPOSITORIES = {
       fileUrlBuilder: filename => `${rootUrl}/blob/master/${filename}`,
       releasesPageUrl: `${rootUrl}/releases`
     };
+  },
+  'gitlab.com': parsedRepositoryUrl => {
+    const repositoryId = /^(.+?\/.+?)(?:\/|\.git$|$)/.exec(parsedRepositoryUrl.pathname.slice(1))[1];
+    const rootUrl = `https://gitlab.com/${repositoryId}`;
+
+    return {
+      repositoryId,
+      fileUrlBuilder: filename => `${rootUrl}/-/blob/master/${filename}`,
+      releasesPageUrl: `${rootUrl}/-/releases`
+    };
   }
 };
 

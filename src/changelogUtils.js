@@ -54,7 +54,14 @@ export async function findModuleChangelogUrl(moduleName, remoteChangelogUrlsDbUr
           _.map(possibleChangelogUrls, url =>
             Bluebird
               .try(() => got(url))
-              .return(url)
+              .then(response => {
+                // Considering only 2xx codes as successful as e.g. GitLab returns 304 for missing files
+                if (response.statusCode >= 300) {
+                  throw response;
+                } else {
+                  return url;
+                }
+              })
           )
         );
       } catch (err) {
