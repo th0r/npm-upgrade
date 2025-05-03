@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import {writeFileSync} from 'fs';
 
 import _ from 'lodash';
@@ -98,6 +99,9 @@ export const handler = catchAsyncError(async opts => {
     return console.log(success('All dependencies are up-to-date!'));
   }
 
+  // Get the full version list for packages that need updating
+  const allVersions = await getAllPackageVersions(Object.keys(upgradedVersions), currentVersions);
+
   // Getting the list of ignored modules
   const config = new Config();
   config.ignore = config.ignore || {};
@@ -164,6 +168,9 @@ export const handler = catchAsyncError(async opts => {
       choices: _.compact([
         {name: 'Yes', value: true},
         {name: 'No', value: false},
+        // Show this if we have a version list
+        (allVersions[name] && allVersions[name].length) &&
+        {name: 'Specific version', value: 'specific-version'},
         // Don't show this option if we couldn't find module's changelog url
         (changelogUrl !== null) &&
         {name: 'Show changelog', value: 'changelog'},
@@ -222,6 +229,13 @@ export const handler = catchAsyncError(async opts => {
         config.ignore[name] = {versions, reason};
         break;
       }
+
+      case 'specific-version':
+        const specificVersion = await askSpecificVersion(name, allVersions, currentVersions);
+        updatedModules.push({...outdatedModule, to: specificVersion});
+        setModuleVersion(name, specificVersion, packageJson);
+        delete config.ignore[name];
+        break;
 
       case 'finish':
         isUpdateFinished = true;
@@ -312,4 +326,59 @@ function sortModules(modules) {
       modules.splice(originalModuleIndex + 1, 0, module);
     }
   }
+}
+
+async function getAllPackageVersions(packageList, currentVersions = {}) {
+  // Get the full version list for packages that need updating
+  const packageManager = ncu.getPackageManager();
+
+  const allVersions = {};
+  for (const name of packageList) {
+    const current = currentVersions[name];
+    // The current version is usually already memoized, so lookups should be instant
+    const versionObj = await packageManager.viewOne(name, 'versions', current, {});
+
+    allVersions[name] = Object.keys(versionObj);
+  }
+
+  return allVersions;
+}
+
+async function askSpecificVersion(name, allVersions, currentVersions) {
+  let prefix = '';
+  let current = currentVersions[name] || '';
+
+  if (current && (/^[^~>]/.test(current))) {
+    // starts with ^, ~, or >
+    prefix = current[0];
+    current = current.substr(1);
+  }
+
+  let versions = allVersions[name] || [current];
+  try {
+    versions = versions.sort(semver.compare);
+  } catch (e) {
+    // ignore errors, use original order
+  }
+
+  let specificVersion = await askUser({
+    type: 'list',
+    message: `Select version for "${name}"?`,
+    choices: versions,
+    default: current
+  });
+
+  specificVersion = await askUser({
+    type: 'list',
+    message: 'Exact version or range?',
+    choices: [
+      {name: ` ${specificVersion} - Exact version (x.x.x)`, value: specificVersion},
+      {name: `~${specificVersion} - Allow patches (x.x.?)`, value: `~${specificVersion}`},
+      {name: `^${specificVersion} - Allow minor and patches (x.?.?)`, value: `^${specificVersion}`}
+    ],
+    // default to the same prefix as currently used
+    default: prefix + specificVersion
+  });
+
+  return specificVersion;
 }
