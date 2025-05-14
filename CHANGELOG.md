@@ -11,6 +11,8 @@
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
 ## UNRELEASED
+
+## 3.1.2
 * **Improvement**
   * Don't check for version updates for filtered out dependencies (fixes [#96](https://github.com/th0r/npm-upgrade/issues/96))
 
