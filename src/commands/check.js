@@ -50,8 +50,6 @@ export function builder(yargs) {
 /* eslint complexity: "off" */
 export const handler = catchAsyncError(async opts => {
   const {filter} = opts;
-  // Making function that will filter out deps by module name
-  const filterModuleName = makeFilterFunction(filter);
 
   // Checking all the deps if all of them are omitted
   if (_.every(DEPS_GROUPS, ({name}) => !opts[name])) {
@@ -84,15 +82,10 @@ export const handler = catchAsyncError(async opts => {
     .filter(({name}) => opts[name])
     .map(({ncuValue}) => ncuValue)
     .join(',');
-  const currentVersions = ncu.getCurrentDependencies(packageJson, {dep: ncuDepGroups});
+  const filteredPackageJson = filterDepsInPackageJson(packageJson, makeFilterFunction(filter));
+  const currentVersions = ncu.getCurrentDependencies(filteredPackageJson, {dep: ncuDepGroups});
   const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest', timeout: 0});
-  let upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
-
-  // Filtering modules that have to be updated
-  upgradedVersions = _.pickBy(
-    upgradedVersions,
-    (newVersion, moduleName) => filterModuleName(moduleName)
-  );
+  const upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
 
   if (_.isEmpty(upgradedVersions)) {
     return console.log(success('All dependencies are up-to-date!'));
@@ -278,6 +271,24 @@ export const handler = catchAsyncError(async opts => {
     );
   }
 });
+
+function filterDepsInPackageJson(packageJson, moduleNameFilterFn) {
+  const result = _.cloneDeep(packageJson);
+
+  for (const depsGroup of DEPS_GROUPS) {
+    const deps = result[depsGroup.field];
+
+    if (deps) {
+      for (const moduleName of Object.keys(deps)) {
+        if (!moduleNameFilterFn(moduleName)) {
+          delete deps[moduleName];
+        }
+      }
+    }
+  }
+
+  return result;
+}
 
 function sortModules(modules) {
   const processedModules = new Set();

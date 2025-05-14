@@ -10,6 +10,10 @@
 
 _Note: Gaps between patch versions are faulty, broken or test releases._
 
+## UNRELEASED
+* **Improvement**
+  * Don't check for version updates for filtered out dependencies (fixes [#96](https://github.com/th0r/npm-upgrade/issues/96))
+
 ## 3.1.1
 * **Improvement**
   * Disable timeout for fetching NPM repository (fixes [#74](https://github.com/th0r/npm-upgrade/issues/74))
