@@ -153,13 +153,24 @@ export const handler = catchAsyncError(async opts => {
     // This checks if the package was released less than 3 days ago, throws a warning if true
     let publishedDate = await getVersionPublicationDate(name, to);
     publishedDate = new Date(publishedDate);
-    const recommendedDatePrior = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3)); // This is 3 days prior to execution time.
+    // This is 3 days prior to execution time.
+    const recommendedDatePrior = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
     const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
     if (isRecent) {
       const timeSincePublication = new Date(Date.now()).getTime() - publishedDate.getTime();
-      const warningLevel = (isRecent && timeSincePublication < (1000 * 60 * 60 * 24 * 1)) ? 'caution' : (timeSincePublication < (1000 * 60 * 60 * 24 * 2)) ? 'warning' : 'info';
-      let message = (warningLevel === 'caution') ? upgradeCaution("CAUTION") : (warningLevel === 'warning') ? upgradeWarning("WARN") : upgradeInfo("INFO");
-      message += ` ${name}@${to.replace("^", "")} was released less than ${Math.ceil(timeSincePublication / (1000*60*60*24))} days ago, be careful when upgrading.`;
+      const warningLevel = (isRecent
+        && timeSincePublication < (1000 * 60 * 60 * 24 * 1)) ? 'caution'
+        : (timeSincePublication < (1000 * 60 * 60 * 24 * 2)) ? 'warning'
+          : 'info';
+      let message = (warningLevel === 'caution')
+        ? upgradeCaution('CAUTION') : (warningLevel === 'warning')
+          ? upgradeWarning('WARN') : upgradeInfo('INFO');
+      message += ` ${name}@${to.replace(
+        '^',
+        ''
+      )} was released less than ${Math.ceil(
+        timeSincePublication / (1000 * 60 * 60 * 24)
+      )} days ago, be careful when upgrading.`;
       console.log(message);
     }
 
