@@ -4,5 +4,10 @@
       "versions": ">=6.0.0",
       "reason": "^5 is required for 'eslint-config-th0r'"
     }
+  },
+  "recentUpdates": {
+    "info": "3d",
+    "warning": "2d",
+    "caution": "1d"
   }
 }
