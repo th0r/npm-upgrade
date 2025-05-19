@@ -17,7 +17,7 @@ import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention, upgradeCaution, upgradeWarning, upgradeInfo} from '../cliStyles';
 import askUser from '../askUser';
-import {toSentence} from '../stringUtils';
+import {toSentence, toTimespan} from '../stringUtils';
 import {askIgnoreFields} from './ignore';
 import Config from '../Config';
 
@@ -150,26 +150,37 @@ export const handler = catchAsyncError(async opts => {
     // Adds new line
     console.log('');
 
+    let infoTime = toTimespan(config.recentUpdates?.info ?? '3d');
+    let warningTime = toTimespan(config.recentUpdates?.warning ?? '2d');
+    let cautionTime = toTimespan(config.recentUpdates?.caution ?? '1d');
+
+    // If timespan are not valid, print an error and set to default values
+    if (infoTime < warningTime || infoTime < cautionTime || warningTime < cautionTime) {
+      console.error('Invalid timespan values in config.recentUpdates. Using default values.');
+      infoTime = toTimespan('3d');
+      warningTime = toTimespan('2d');
+      cautionTime = toTimespan('1d');
+    }
+
     // This checks if the package was released less than 3 days ago, throws a warning if true
-    let publishedDate = await getVersionPublicationDate(name, to);
-    publishedDate = new Date(publishedDate);
+    const publishedDate = new Date(await getVersionPublicationDate(name, to));
     // This is 3 days prior to execution time.
-    const recommendedDatePrior = new Date(Date.now() - (1000 * 60 * 60 * 24 * 3));
+    const recommendedDatePrior = new Date(Date.now() - infoTime);
     const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
     if (isRecent) {
       const timeSincePublication = new Date(Date.now()).getTime() - publishedDate.getTime();
       const warningLevel = (isRecent
-        && timeSincePublication < (1000 * 60 * 60 * 24 * 1)) ? 'caution'
-        : (timeSincePublication < (1000 * 60 * 60 * 24 * 2)) ? 'warning'
+        && timeSincePublication < cautionTime) ? 'caution'
+        : (timeSincePublication < warningTime) ? 'warning'
           : 'info';
       let message = (warningLevel === 'caution')
         ? upgradeCaution('CAUTION') : (warningLevel === 'warning')
           ? upgradeWarning('WARN') : upgradeInfo('INFO');
       message += ` ${name}@${to.replace(
-        '^',
+        /[~^]/,
         ''
       )} was released less than ${Math.ceil(
-        timeSincePublication / (1000 * 60 * 60 * 24)
+        timeSincePublication / toTimespan('1d')
       )} days ago, be careful when upgrading.`;
       console.log(message);
     }
