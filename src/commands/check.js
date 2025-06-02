@@ -140,6 +140,18 @@ export const handler = catchAsyncError(async opts => {
     console.log(`\n${strong('Ignored updates:')}\n\n${createSimpleTable(rows)}`);
   }
 
+  let infoTime = toTimespan(config.recentUpdates?.info ?? '3d');
+  let warningTime = toTimespan(config.recentUpdates?.warning ?? '2d');
+  let cautionTime = toTimespan(config.recentUpdates?.caution ?? '1d');
+
+  // If timespan are not valid, print an error and set to default values
+  if (infoTime < warningTime || infoTime < cautionTime || warningTime < cautionTime) {
+    console.error('Invalid timespan values in config.recentUpdates. Using default values.');
+    infoTime = toTimespan('3d');
+    warningTime = toTimespan('2d');
+    cautionTime = toTimespan('1d');
+  }
+
   const updatedModules = [];
   let isUpdateFinished = false;
   while (modulesToUpdate.length && !isUpdateFinished) {
@@ -149,18 +161,6 @@ export const handler = catchAsyncError(async opts => {
 
     // Adds new line
     console.log('');
-
-    let infoTime = toTimespan(config.recentUpdates?.info ?? '3d');
-    let warningTime = toTimespan(config.recentUpdates?.warning ?? '2d');
-    let cautionTime = toTimespan(config.recentUpdates?.caution ?? '1d');
-
-    // If timespan are not valid, print an error and set to default values
-    if (infoTime < warningTime || infoTime < cautionTime || warningTime < cautionTime) {
-      console.error('Invalid timespan values in config.recentUpdates. Using default values.');
-      infoTime = toTimespan('3d');
-      warningTime = toTimespan('2d');
-      cautionTime = toTimespan('1d');
-    }
 
     // This checks if the package was released less than 3 days ago, throws a warning if true
     const publishedDate = new Date(await getVersionPublicationDate(name, to));
