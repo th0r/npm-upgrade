@@ -46,6 +46,9 @@ Update "@angular/common" in package.json from 2.4.8 to 2.4.10? (Use arrow keys)
 * `Ignore` will add this module to the ignored list (see details in [`Ignoring module`](#ignoring-module) section below).
 * `Finish update process` will ...hm... finish update process and save all the changes to `package.json`.
 
+> [!NOTE]
+> By default, `npm-upgrade` will show warnings for modules that have recent updates (by default, within the last 3 days). You can change this behavior by modifying `config.recentUpdates` in your `~/.npm-upgrade/config.json` file. For example, you can set it to `{"info": "1d", "warning": "2d", "caution": "3d"}` to show warnings for modules updated within the last 1 day, 2 days, and 3 days respectively.
+
 A note on saving changes to `package.json`: when you choose `Yes` to update some module's version, `package.json` won't be immediately updated. It will be updated only after you will process all the outdated modules and confirm update **or** when you choose `Finish update process`. So if in the middle of the update process you've changed your mind just press `Ctrl+C` and `package.json` will remain untouched.
 
 If you want to check only some deps, you can use `filter` argument:

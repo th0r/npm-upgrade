@@ -12,14 +12,15 @@ import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
 import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion,
-  getModuleInfo, getModuleHomepage, getVersionPublicationDate} from '../packageUtils';
+  getModuleInfo, getModuleHomepage, getVersionPublicationDate,
+  getModuleVersions} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention, upgradeCaution, upgradeWarning, upgradeInfo} from '../cliStyles';
 import askUser from '../askUser';
 import {toSentence, toTimespan} from '../stringUtils';
 import {askIgnoreFields} from './ignore';
-import Config from '../Config';
+import Config, {RECENT_UPDATES_DEFAULT} from '../Config';
 
 const pkg = require('../../package.json');
 
@@ -140,16 +141,29 @@ export const handler = catchAsyncError(async opts => {
     console.log(`\n${strong('Ignored updates:')}\n\n${createSimpleTable(rows)}`);
   }
 
-  let infoTime = toTimespan(config.recentUpdates?.info ?? '3d');
-  let warningTime = toTimespan(config.recentUpdates?.warning ?? '2d');
-  let cautionTime = toTimespan(config.recentUpdates?.caution ?? '1d');
+  let infoTime = toTimespan(config.recentUpdates?.info ?? RECENT_UPDATES_DEFAULT.info);
+  let warningTime = toTimespan(config.recentUpdates?.warning ?? RECENT_UPDATES_DEFAULT.warning);
+  let cautionTime = toTimespan(config.recentUpdates?.caution ?? RECENT_UPDATES_DEFAULT.caution);
 
   // If timespan are not valid, print an error and set to default values
   if (infoTime < warningTime || infoTime < cautionTime || warningTime < cautionTime) {
     console.error('Invalid timespan values in config.recentUpdates. Using default values.');
-    infoTime = toTimespan('3d');
-    warningTime = toTimespan('2d');
-    cautionTime = toTimespan('1d');
+    infoTime = toTimespan(RECENT_UPDATES_DEFAULT.info);
+    warningTime = toTimespan(RECENT_UPDATES_DEFAULT.warning);
+    cautionTime = toTimespan(RECENT_UPDATES_DEFAULT.caution);
+  }
+
+  // Preload published dates in the background before the loop
+  if (!handler.publishedDatesCache) {
+    handler.publishedDatesCache = {};
+    await Promise.all(modulesToUpdate.map(async ({name, to}) => {
+      handler.publishedDatesCache[`${name}@${to}`] = new Date(await getVersionPublicationDate(name, to));
+    }));
+  }
+
+  // Wait for at least one published date to be fetched
+  while (Object.keys(handler.publishedDatesCache).length < modulesToUpdate.length) {
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   const updatedModules = [];
@@ -162,9 +176,9 @@ export const handler = catchAsyncError(async opts => {
     // Adds new line
     console.log('');
 
-    // This checks if the package was released less than 3 days ago, throws a warning if true
-    const publishedDate = new Date(await getVersionPublicationDate(name, to));
-    // This is 3 days prior to execution time.
+    // This checks if the package was released less than N days ago, throws a warning if true
+    const publishedDate = handler.publishedDatesCache[`${name}@${to}`];
+    // This is N days prior to execution time.
     const recommendedDatePrior = new Date(Date.now() - infoTime);
     const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
     if (isRecent) {
@@ -176,10 +190,10 @@ export const handler = catchAsyncError(async opts => {
       let message = (warningLevel === 'caution')
         ? upgradeCaution('CAUTION') : (warningLevel === 'warning')
           ? upgradeWarning('WARN') : upgradeInfo('INFO');
-      message += ` ${name}@${to.replace(
-        /[~^]/,
-        ''
-      )} was released less than ${Math.ceil(
+
+      const versions = await getModuleVersions(name);
+      const resolvedVersion = semver.maxSatisfying(Object.keys(versions), to);
+      message += ` ${name}@${resolvedVersion} was released less than ${Math.ceil(
         timeSincePublication / toTimespan('1d')
       )} days ago, be careful when upgrading.`;
       console.log(message);

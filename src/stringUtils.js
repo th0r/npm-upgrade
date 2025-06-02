@@ -7,7 +7,7 @@ export function toSentence(items) {
 }
 
 export function toTimespan(string) {
-  const match = string.match(/(\d+)([smhd])/);
+  const match = string.match(/^(\d+)([smhd])$/);
   if (!match) {
     return null;
   }
