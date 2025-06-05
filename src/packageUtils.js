@@ -5,6 +5,8 @@ import pacote from 'pacote';
 import shell from 'shelljs';
 
 import _ from 'lodash';
+import got from 'got';
+import {maxSatisfying, validRange} from 'semver';
 
 export const DEPS_GROUPS = [
   {name: 'global', field: 'dependencies', flag: 'g', ncuValue: 'prod'},
@@ -108,3 +110,15 @@ export const getModuleInfo = _.memoize(async moduleName =>
     fullMetadata: true
   })
 );
+
+export const getModuleVersions = _.memoize(async moduleName => {
+  const moduleData = await got(`https://registry.npmjs.org/${moduleName}/`).json();
+  return moduleData.time;
+});
+
+// This function returns the publication date of a specific module version.
+export const getVersionPublicationDate = _.memoize(async (moduleName, version) => {
+  const versions = await getModuleVersions(moduleName);
+  const resolvedVersion = maxSatisfying(Object.keys(versions), validRange(version));
+  return versions[resolvedVersion] || null;
+}, (moduleName, version) => `${moduleName}@${version}`);

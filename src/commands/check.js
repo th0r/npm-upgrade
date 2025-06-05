@@ -12,14 +12,15 @@ import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
 import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion,
-  getModuleInfo, getModuleHomepage} from '../packageUtils';
+  getModuleInfo, getModuleHomepage, getVersionPublicationDate,
+  getModuleVersions} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
-import {strong, success, attention} from '../cliStyles';
+import {strong, success, attention, upgradeCaution, upgradeWarning, upgradeInfo} from '../cliStyles';
 import askUser from '../askUser';
-import {toSentence} from '../stringUtils';
+import {toSentence, toTimespan} from '../stringUtils';
 import {askIgnoreFields} from './ignore';
-import Config from '../Config';
+import Config, {RECENT_UPDATES_DEFAULT} from '../Config';
 
 const pkg = require('../../package.json');
 
@@ -140,6 +141,24 @@ export const handler = catchAsyncError(async opts => {
     console.log(`\n${strong('Ignored updates:')}\n\n${createSimpleTable(rows)}`);
   }
 
+  let infoTime = toTimespan(config.recentUpdates?.info ?? RECENT_UPDATES_DEFAULT.info);
+  let warningTime = toTimespan(config.recentUpdates?.warning ?? RECENT_UPDATES_DEFAULT.warning);
+  let cautionTime = toTimespan(config.recentUpdates?.caution ?? RECENT_UPDATES_DEFAULT.caution);
+
+  // If timespan are not valid, print an error and set to default values
+  if (infoTime < warningTime || infoTime < cautionTime || warningTime < cautionTime) {
+    console.error('Invalid timespan values in config.recentUpdates. Using default values.');
+    infoTime = toTimespan(RECENT_UPDATES_DEFAULT.info);
+    warningTime = toTimespan(RECENT_UPDATES_DEFAULT.warning);
+    cautionTime = toTimespan(RECENT_UPDATES_DEFAULT.caution);
+  }
+
+  // Preload published dates in the background before the loop
+  const publishedDatesCache = {};
+  modulesToUpdate.forEach(({name, to}) => {
+    publishedDatesCache[`${name}@${to}`] = getVersionPublicationDate(name, to);
+  });
+
   const updatedModules = [];
   let isUpdateFinished = false;
   while (modulesToUpdate.length && !isUpdateFinished) {
@@ -149,6 +168,29 @@ export const handler = catchAsyncError(async opts => {
 
     // Adds new line
     console.log('');
+
+    // This checks if the package was released less than N days ago, throws a warning if true
+    const publishedDate = new Date(await publishedDatesCache[`${name}@${to}`]);
+    // This is N days prior to execution time.
+    const recommendedDatePrior = new Date(Date.now() - infoTime);
+    const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
+    if (isRecent) {
+      const timeSincePublication = new Date(Date.now()).getTime() - publishedDate.getTime();
+      const warningLevel = (isRecent
+        && timeSincePublication < cautionTime) ? 'caution'
+        : (timeSincePublication < warningTime) ? 'warning'
+          : 'info';
+      let message = (warningLevel === 'caution')
+        ? upgradeCaution('CAUTION') : (warningLevel === 'warning')
+          ? upgradeWarning('WARN') : upgradeInfo('INFO');
+
+      const versions = await getModuleVersions(name);
+      const resolvedVersion = semver.maxSatisfying(Object.keys(versions), to);
+      message += ` ${name}@${resolvedVersion} was released less than ${Math.ceil(
+        timeSincePublication / toTimespan('1d')
+      )} days ago, be careful when upgrading.`;
+      console.log(message);
+    }
 
     const answer = await askUser({
       type: 'list',

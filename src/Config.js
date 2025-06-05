@@ -80,3 +80,9 @@ function cleanDeep(obj) {
 
   return obj;
 }
+
+export const RECENT_UPDATES_DEFAULT = {
+  info: '3d',
+  warning: '2d',
+  caution: '1d'
+};
