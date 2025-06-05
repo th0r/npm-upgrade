@@ -154,17 +154,12 @@ export const handler = catchAsyncError(async opts => {
   }
 
   // Preload published dates in the background before the loop
-  if (!handler.publishedDatesCache) {
-    handler.publishedDatesCache = {};
-    await Promise.all(modulesToUpdate.map(async ({name, to}) => {
-      handler.publishedDatesCache[`${name}@${to}`] = new Date(await getVersionPublicationDate(name, to));
-    }));
-  }
-
-  // Wait for at least one published date to be fetched
-  while (Object.keys(handler.publishedDatesCache).length < modulesToUpdate.length) {
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
+  const publishedDatesCache = {};
+  modulesToUpdate.forEach(({name, to}) => {
+    publishedDatesCache[`${name}@${to}`] = getVersionPublicationDate(name, to)
+      .then(date => new Date(date))
+      .catch(() => null);
+  });
 
   const updatedModules = [];
   let isUpdateFinished = false;
@@ -177,7 +172,7 @@ export const handler = catchAsyncError(async opts => {
     console.log('');
 
     // This checks if the package was released less than N days ago, throws a warning if true
-    const publishedDate = handler.publishedDatesCache[`${name}@${to}`];
+    const publishedDate = await publishedDatesCache[`${name}@${to}`];
     // This is N days prior to execution time.
     const recommendedDatePrior = new Date(Date.now() - infoTime);
     const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
