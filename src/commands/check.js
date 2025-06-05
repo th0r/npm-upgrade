@@ -156,9 +156,7 @@ export const handler = catchAsyncError(async opts => {
   // Preload published dates in the background before the loop
   const publishedDatesCache = {};
   modulesToUpdate.forEach(({name, to}) => {
-    publishedDatesCache[`${name}@${to}`] = getVersionPublicationDate(name, to)
-      .then(date => new Date(date))
-      .catch(() => null);
+    publishedDatesCache[`${name}@${to}`] = getVersionPublicationDate(name, to);
   });
 
   const updatedModules = [];
@@ -172,7 +170,7 @@ export const handler = catchAsyncError(async opts => {
     console.log('');
 
     // This checks if the package was released less than N days ago, throws a warning if true
-    const publishedDate = await publishedDatesCache[`${name}@${to}`];
+    const publishedDate = new Date(await publishedDatesCache[`${name}@${to}`]);
     // This is N days prior to execution time.
     const recommendedDatePrior = new Date(Date.now() - infoTime);
     const isRecent = publishedDate.getTime() > recommendedDatePrior.getTime();
