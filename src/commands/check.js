@@ -96,7 +96,7 @@ export const handler = catchAsyncError(async opts => {
     .join(',');
   const filteredPackageJson = filterDepsInPackageJson(packageJson, makeFilterFunction(filter));
   const currentVersions = ncu.getCurrentDependencies(filteredPackageJson, {dep: ncuDepGroups});
-  const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget, timeout: 0});
+  const latestVersions = await ncu.queryVersions(currentVersions, {target: versionTarget, timeout: 0});
   const upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
 
   if (_.isEmpty(upgradedVersions)) {
