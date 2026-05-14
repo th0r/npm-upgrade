@@ -36,6 +36,8 @@ export const command = 'check [filter]';
 export const aliases = '*';
 export const describe = 'Check for outdated modules';
 
+const VERSION_TARGETS = ['latest', 'patch', 'minor', 'major'];
+
 export function builder(yargs) {
   DEPS_GROUPS
     .forEach(({name, field, flag}) =>
@@ -45,6 +47,14 @@ export function builder(yargs) {
         describe: `check only "${field}"`
       })
     );
+
+  yargs.option('target', {
+    type: 'string',
+    alias: 't',
+    describe: 'Target version to upgrade to: latest, patch, minor, or major',
+    choices: VERSION_TARGETS,
+    default: 'latest'
+  });
 }
 
 /* eslint complexity: "off" */
@@ -72,9 +82,11 @@ export const handler = catchAsyncError(async opts => {
   const depsGroupsToCheckStr = (depsGroupsToCheck.length === DEPS_GROUPS.length) ?
     '' : `${toSentence(_.map(depsGroupsToCheck, ({name}) => strong(name)))} `;
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
+  const versionTarget = opts.target || 'latest';
+  const targetInfo = versionTarget !== 'latest' ? `(target: ${strong(versionTarget)}) ` : '';
 
   console.log(
-    `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}${opts.global ? '' :
+    `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}${targetInfo}${opts.global ? '' :
       (`for "${strong(packageFile)}"`)}...`
   );
 
@@ -84,7 +96,7 @@ export const handler = catchAsyncError(async opts => {
     .join(',');
   const filteredPackageJson = filterDepsInPackageJson(packageJson, makeFilterFunction(filter));
   const currentVersions = ncu.getCurrentDependencies(filteredPackageJson, {dep: ncuDepGroups});
-  const latestVersions = await ncu.queryVersions(currentVersions, {versionTarget: 'latest', timeout: 0});
+  const latestVersions = await ncu.queryVersions(currentVersions, {target: versionTarget, timeout: 0});
   const upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
 
   if (_.isEmpty(upgradedVersions)) {
