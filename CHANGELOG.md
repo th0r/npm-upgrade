@@ -12,8 +12,14 @@ _Note: Gaps between patch versions are faulty, broken or test releases._
 
 ## UNRELEASED
 
-## 3.2.0
+## 3.3.0
+* **Improvement**
+  * Add `--target greatest` option
 
+* **Bug Fix**
+  * Remove invalid `--target major` option
+
+## 3.2.0
 * **New Feature**
   * Add `--target` flag to filter updates by version type ([#100](https://github.com/th0r/npm-upgrade/pull/100), [@jeremyandes](https://github.com/jeremyandes))
 
