@@ -36,7 +36,7 @@ export const command = 'check [filter]';
 export const aliases = '*';
 export const describe = 'Check for outdated modules';
 
-const VERSION_TARGETS = ['latest', 'patch', 'minor', 'major'];
+const VERSION_TARGETS = ['greatest', 'latest', 'minor', 'patch'];
 
 export function builder(yargs) {
   DEPS_GROUPS
@@ -51,7 +51,7 @@ export function builder(yargs) {
   yargs.option('target', {
     type: 'string',
     alias: 't',
-    describe: 'Target version to upgrade to: latest, patch, minor, or major',
+    describe: 'Target version to upgrade to',
     choices: VERSION_TARGETS,
     default: 'latest'
   });
@@ -82,8 +82,8 @@ export const handler = catchAsyncError(async opts => {
   const depsGroupsToCheckStr = (depsGroupsToCheck.length === DEPS_GROUPS.length) ?
     '' : `${toSentence(_.map(depsGroupsToCheck, ({name}) => strong(name)))} `;
   const filteredWith = filter ? `filtered with ${strong(filter)} ` : '';
-  const versionTarget = opts.target || 'latest';
-  const targetInfo = versionTarget !== 'latest' ? `(target: ${strong(versionTarget)}) ` : '';
+  const versionTarget = opts.target;
+  const targetInfo = versionTarget === 'latest' ? '' : `(target: ${strong(versionTarget)}) `;
 
   console.log(
     `Checking for outdated ${depsGroupsToCheckStr}dependencies ${filteredWith}${targetInfo}${opts.global ? '' :

@@ -92,10 +92,10 @@ If you want to check only for specific version updates, use the `-t` (`--target`
 
 Available values:
 
-- `latest` (default) - check for any newer version
-- `patch` - only patch updates (e.g., 1.0.0 → 1.0.9)
-- `minor` - only minor updates (e.g., 1.0.0 → 1.9.0)
-- `major` - only major updates (e.g., 1.0.0 → 2.0.0)
+- `latest` (default) - Upgrade to whatever the package's "latest" dist-tag points to.
+- `greatest` - Upgrade to the highest version number published, regardless of release date or tag. Includes prereleases.
+- `minor` - Upgrade to the highest minor version without bumping the major version. (e.g., 1.0.0 → 1.9.0)
+- `patch` - Upgrade to the highest patch version without bumping the minor or major versions. (e.g., 1.0.0 → 1.0.9)
 
 Examples:
 
