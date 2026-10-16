@@ -7,9 +7,33 @@ import {strong, attention} from '../cliStyles';
 
 export const command = 'ignore <command>';
 export const describe = 'Manage ignored modules';
+
 export const builder = yargs =>
   yargs
-    .commandDir('ignore')
+    .command({
+      command: 'list',
+      describe: 'Show the list of ignored modules',
+      handler: async argv => {
+        const {handler} = await import('./ignore/list');
+        return handler(argv);
+      }
+    })
+    .command({
+      command: 'add [module]',
+      describe: 'Add module to ignored list',
+      handler: async argv => {
+        const {handler} = await import('./ignore/add');
+        return handler(argv);
+      }
+    })
+    .command({
+      command: 'reset [modules...]',
+      describe: 'Reset ignored modules',
+      handler: async argv => {
+        const {handler} = await import('./ignore/reset');
+        return handler(argv);
+      }
+    })
     .demandCommand(1, 'Provide valid command');
 
 export function createIgnoredModulesTable(ignoredModulesConfig, moduleNames = _.keys(ignoredModulesConfig)) {
