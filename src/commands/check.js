@@ -5,8 +5,8 @@ import {flow, map, partition} from 'lodash/fp';
 import open from 'open';
 import semver from 'semver';
 import detectIndent from 'detect-indent';
-import ncu from 'npm-check-updates';
 import shell from 'shelljs';
+import * as ncu from 'npm-check-updates/lib/versionmanager';
 import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
@@ -96,7 +96,13 @@ export const handler = catchAsyncError(async opts => {
     .join(',');
   const filteredPackageJson = filterDepsInPackageJson(packageJson, makeFilterFunction(filter));
   const currentVersions = ncu.getCurrentDependencies(filteredPackageJson, {dep: ncuDepGroups});
-  const latestVersions = await ncu.queryVersions(currentVersions, {target: versionTarget, timeout: 0});
+  // Cap concurrency: ncu/p-map default is Infinity, which fans out one packument
+  // request per dependency and spikes memory/sockets on large projects.
+  const latestVersions = await ncu.queryVersions(currentVersions, {
+    target: versionTarget,
+    timeout: 0,
+    concurrency: 8
+  });
   const upgradedVersions = ncu.upgradeDependencies(currentVersions, latestVersions);
 
   if (_.isEmpty(upgradedVersions)) {
