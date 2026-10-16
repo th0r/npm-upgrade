@@ -1,8 +1,7 @@
 import {resolve} from 'path';
 import {readFileSync} from 'fs';
+import {execFileSync, spawnSync} from 'child_process';
 import libnpmconfig from 'libnpmconfig';
-import pacote from 'pacote';
-import shell from 'shelljs';
 
 import _ from 'lodash';
 
@@ -33,11 +32,23 @@ const getNpmConfig = _.memoize(() => {
 });
 
 export function loadGlobalPackages() {
-  const res = shell.exec('npm ls -g --depth 0 --json', {silent: true});
-  if (res.code !== 0) {throw new Error(`Could not determine global packages: ${res.stderr}`)}
+  let stdout;
 
   try {
-    const {dependencies} = JSON.parse(res);
+    stdout = execFileSync('npm', ['ls', '-g', '--depth', '0', '--json'], {
+      encoding: 'utf8'
+    });
+  } catch (err) {
+    // `npm ls` often exits non-zero when the tree has warnings; stdout may still be valid JSON.
+    if (err.stdout) {
+      stdout = Buffer.isBuffer(err.stdout) ? err.stdout.toString('utf8') : err.stdout;
+    } else {
+      throw new Error(`Could not determine global packages: ${err.stderr || err.message}`);
+    }
+  }
+
+  try {
+    const {dependencies} = JSON.parse(stdout);
     const content = {dependencies};
 
     for (const [pkg, {version}] of Object.entries(dependencies)) {content.dependencies[pkg] = version}
@@ -47,6 +58,19 @@ export function loadGlobalPackages() {
     console.error(`Error parsing global packages: ${err.message}`);
     process.exit(1);
   }
+}
+
+export function installGlobalPackages(packageSpecs) {
+  const result = spawnSync('npm', ['install', '--global', ...packageSpecs], {
+    encoding: 'utf8',
+    stdio: 'inherit'
+  });
+
+  if (result.error) {
+    throw result.error;
+  }
+
+  return result.status;
 }
 
 export function loadPackageJson() {
@@ -102,9 +126,13 @@ export function getModuleHomepage(packageJson) {
   return packageJson.homepage || packageJson.url || null;
 }
 
-export const getModuleInfo = _.memoize(async moduleName =>
-  pacote.manifest(moduleName, {
+export const getModuleInfo = _.memoize(async moduleName => {
+  // Lazy-load pacote so light paths (e.g. Config / ignore list) do not pay for it.
+  // eslint-disable-next-line global-require
+  const pacote = require('pacote');
+
+  return pacote.manifest(moduleName, {
     ...getNpmConfig(),
     fullMetadata: true
-  })
-);
+  });
+});

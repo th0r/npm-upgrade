@@ -6,13 +6,12 @@ import open from 'open';
 import semver from 'semver';
 import detectIndent from 'detect-indent';
 import ncu from 'npm-check-updates';
-import shell from 'shelljs';
 import {colorizeDiff} from 'npm-check-updates/lib/version-util';
 
 import catchAsyncError from '../catchAsyncError';
 import {makeFilterFunction} from '../filterUtils';
 import {DEPS_GROUPS, loadGlobalPackages, loadPackageJson, setModuleVersion,
-  getModuleInfo, getModuleHomepage} from '../packageUtils';
+  getModuleInfo, getModuleHomepage, installGlobalPackages} from '../packageUtils';
 import {fetchRemoteDb, findModuleChangelogUrl} from '../changelogUtils';
 import {createSimpleTable} from '../cliTable';
 import {strong, success, attention} from '../cliStyles';
@@ -266,7 +265,7 @@ export const handler = catchAsyncError(async opts => {
     if (!shouldUpdateGlobalPackages) {return}
 
     console.log(`Automatically upgrading ${updatedModules.length} module${updatedModules.length !== 1 ? 's' : ''}...`);
-    return shell.exec(`npm install --global ${updatedModules.map(({name, to}) => `${name}@${to}`).join(' ')}`);
+    return installGlobalPackages(updatedModules.map(({name, to}) => `${name}@${to}`));
   }
 
   const shouldUpdatePackageFile = await askUser(

@@ -1,6 +1,5 @@
 import {resolve} from 'path';
-import {writeFileSync} from 'fs';
-import del from 'del';
+import {unlinkSync, writeFileSync} from 'fs';
 import _ from 'lodash';
 import detectIndent from 'detect-indent';
 import {loadPackageJson} from './packageUtils';
@@ -48,7 +47,11 @@ export default class Config {
   }
 
   remove() {
-    return del.sync(this[path]);
+    try {
+      unlinkSync(this[path]);
+    } catch (err) {
+      if (err.code !== 'ENOENT') throw err;
+    }
   }
 
   [read]() {
