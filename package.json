@@ -27,7 +27,6 @@
   "preferGlobal": true,
   "dependencies": {
     "@babel/runtime": "7.13.7",
-    "bluebird": "3.7.2",
     "chalk": "4.1.0",
     "cli-table": "0.3.5",
     "del": "6.0.0",
